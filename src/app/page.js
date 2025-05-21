@@ -1,56 +1,79 @@
+"use client"
 import Image from "next/image";
+import { useTheme } from "next-themes";
+import clsx from "clsx";
+import { useEffect, useState } from "react";
+import { CheckCircleIcon} from '@heroicons/react/24/outline';
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.js
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Avoid rendering until mounted (to prevent hydration mismatch)
+  if (!mounted) return null;
+  return (
+    <div className={clsx(" items-center justify-items-start min-h-screen font-[family-name:var(--font-geist-sans)]",
+      {
+        "light": theme === 'light',
+        "dark": theme === 'dark',
+      }
+    )}>
+      <main className={clsx("flex w-full flex-col sm:h-screen p-8 pb-20  sm:p-20 gap-[16px] md:gap-[32px] row-start-2  justify-center sm:items-start",
+        {
+          "bg-[url(/images/bg-rose.png)]": theme === 'light',
+          " bg-[url(/images/bg-dark.png)]": theme === 'dark',
+        }
+      )}>
+        <h1 className="text-4xl md:text-8xl font-bold">AgileIT</h1>
+        <h1 className="text-4xl md:text-8xl font-bold">Project management tool</h1>
+        <button className={clsx("cursor-pointer rounded-md py-2 px-4 border border-transparent text-center text-sm text-white transition-all shadow-md hover:shadow-lg  active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none ml-2",
+          {
+            " bg-slate-800 focus:bg-slate-700 focus:shadow-none active:bg-slate-700 hover:bg-slate-700": theme === 'light',
+            " bg-blue-800 focus:bg-blue-700 focus:shadow-none active:bg-blue-700 hover:bg-blue-700": theme === 'dark',
+          })} onClick={() => {
+            theme == 'light' ? setTheme('dark') : setTheme('light')
+          }}>Toggle Theme</button>
       </main>
+      <section className="flex flex-row row-start-2 p-8 pb-20 sm:p-20 w-full ">
+        <div className="flex flex-1/2 justify-center items-center">
+          <div className="flex sm:flex-1/2 flex-col ">
+          <span className="text-2xl font-light pb-8">Ideate, Plan, Execute</span>
+          <h1 className="text-4xl pb-4">Made for comlpex projects or everyday tasks</h1>
+          <p className="pb-8">Discover a sleek, professional platform designed for seamless user experience. This app allows you to collaborate and manage projects and teams.</p>
+          <ul className="pb-8">
+            <li>
+              <span className="flex items-center gap-2">
+                <CheckCircleIcon className="h-8 w-8" /> Sprint Backlog
+              </span>
+            </li>
+            <li>
+              <span className="flex items-center gap-2">
+                <CheckCircleIcon className="h-8 w-8" /> Task Tracker
+              </span>
+            </li>
+            <li>
+              <span className="flex items-center gap-2">
+                <CheckCircleIcon className="h-8 w-8" /> Easy Project Creation
+              </span>
+            </li>
+          </ul>
+          <button className={clsx("cursor-pointer rounded-md py-2 px-4 max-w-fit border border-transparent text-center text-sm text-white transition-all shadow-md hover:shadow-lg  active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none",
+          {
+            " bg-slate-800 focus:bg-slate-700 focus:shadow-none active:bg-slate-700 hover:bg-slate-700": theme === 'light',
+            " bg-blue-800 focus:bg-blue-700 focus:shadow-none active:bg-blue-700 hover:bg-blue-700": theme === 'dark',
+          })}>
+            Get Started
+          </button>
+        </div>
+        </div>
+        <div className="hidden sm:flex flex-1/2">
+          <Image src={'/images/project_board_bg.png'} width="1024" height={1024} alt="Project management board" className="h-full w-full"></Image>
+        </div>
+      </section>
       <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
         <a
           className="flex items-center gap-2 hover:underline hover:underline-offset-4"
