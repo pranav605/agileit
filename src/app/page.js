@@ -42,7 +42,7 @@ export default function Home() {
         <div className="flex flex-1/2 justify-center items-center">
           <div className="flex sm:flex-1/2 flex-col ">
           <span className="text-2xl font-light pb-8">Ideate, Plan, Execute</span>
-          <h1 className="text-4xl pb-4">Made for comlpex projects or everyday tasks</h1>
+          <h1 className="text-4xl pb-4">Made for comlpex projects and everyday tasks</h1>
           <p className="pb-8">Discover a sleek, professional platform designed for seamless user experience. This app allows you to collaborate and manage projects and teams.</p>
           <ul className="pb-8">
             <li>
