@@ -12,8 +12,10 @@ export const authOptions = {
       clientSecret: process.env.GOOGLE_SECRET,
     }),
   ],
-  
   secret: process.env.NEXTAUTH_SECRET,
+  pages:{
+    signIn:'/signIn'
+  },
   callbacks: {
     async redirect({ baseUrl }) {
       return `${baseUrl}/dashboard`;

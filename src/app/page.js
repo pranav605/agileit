@@ -5,6 +5,7 @@ import clsx from "clsx";
 import { useEffect, useState } from "react";
 import { CheckCircleIcon} from '@heroicons/react/24/outline';
 import { redirect } from "next/navigation";
+import ThemedButton from "@/components/ThemedButton";
 
 export default function Home() {
   const { theme, setTheme } = useTheme();
@@ -32,20 +33,10 @@ export default function Home() {
         <h1 className="text-4xl md:text-8xl font-bold">AgileIT</h1>
         <h1 className="text-4xl md:text-8xl font-bold">Project management tool</h1>
         <div className="flex flex-row gap-2">
-          <button className={clsx("cursor-pointer rounded-md py-2 px-4 border border-transparent text-center text-sm text-white transition-all shadow-md hover:shadow-lg  active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none ml-2",
-          {
-            " bg-slate-800 focus:bg-slate-700 focus:shadow-none active:bg-slate-700 hover:bg-slate-700": theme === 'light',
-            " bg-blue-800 focus:bg-blue-700 focus:shadow-none active:bg-blue-700 hover:bg-blue-700": theme === 'dark',
-          })} onClick={() => {
+          <ThemedButton onClick={() => {
             theme == 'light' ? setTheme('dark') : setTheme('light')
-          }}>Toggle Theme</button>
-          <button className={clsx("cursor-pointer rounded-md py-2 px-4 border border-transparent text-center text-sm text-white transition-all shadow-md hover:shadow-lg  active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none ml-2",
-          {
-            " bg-slate-800 focus:bg-slate-700 focus:shadow-none active:bg-slate-700 hover:bg-slate-700": theme === 'light',
-            " bg-blue-800 focus:bg-blue-700 focus:shadow-none active:bg-blue-700 hover:bg-blue-700": theme === 'dark',
-          })} onClick={() => {
-            redirect('/dashboard');
-          }}>Get Started</button>
+          }} label={"Toggle Theme"}/>
+         <ThemedButton onClick={()=>redirect('/dashboard')} label={"Get Started"}/>
         </div>
       </main>
       <section className="flex flex-row row-start-2 p-8 pb-20 sm:p-20 w-full ">
