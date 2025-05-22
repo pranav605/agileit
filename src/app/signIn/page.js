@@ -97,7 +97,7 @@ export default function SignIn() {
                     >
                         Login
                     </button>
-                    <span className={`m-auto ${labelText}`}>Don't have an account? <Link href={'#'} className='underline'>Sign Up</Link></span>
+                    <span className={`m-auto ${labelText}`}>Don't have an account? <Link href={'/signUp'} className='underline'>Sign Up</Link></span>
                     <div className={`flex flex-row justify-between items-center gap-2 ${labelText}`}>
                         <hr className='w-full '></hr>
                         <span>or</span>
