@@ -1,14 +1,14 @@
 'use client'
-import { signIn } from 'next-auth/react';
-import React, { useEffect, useState } from 'react';
 import { useTheme } from 'next-themes';
-import { PresentationChartLineIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
+import React, { useEffect, useState } from 'react'
 
-export default function SignIn() {
-    const [email, setEmail] = React.useState('');
-    const [password, setPassword] = React.useState('');
-    const [error, setError] = React.useState('');
+export default function SignUp() {
+    const [name, setName] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [error, setError] = useState('');
     const { theme } = useTheme();
     const [mounted, setMounted] = useState(false);
 
@@ -18,7 +18,10 @@ export default function SignIn() {
 
     if (!mounted) return null;
 
-    // Theme-based classes
+    const handleSubmit = async (e) => {
+
+    }
+
     const bgGradient = theme === 'dark'
         ? 'bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950'
         : 'bg-gradient-to-br from-blue-50 via-white to-purple-100';
@@ -28,7 +31,7 @@ export default function SignIn() {
     const inputBg = theme === 'dark'
         ? 'bg-gray-800 border-gray-700 placeholder-zinc-400 text-zinc-200'
         : 'bg-gray-100 border-gray-300 placeholder-zinc-400 text-zinc-600';
-    const loginBtn = theme === 'dark'
+    const signUpBtn = theme === 'dark'
         ? 'bg-gradient-to-r from-blue-800 to-purple-800'
         : 'bg-gradient-to-r from-blue-600 to-purple-600';
     const labelText = theme === 'dark'
@@ -44,19 +47,6 @@ export default function SignIn() {
         ? 'bg-gray-900 border-gray-700 hover:bg-gray-800 text-gray-100'
         : 'bg-white border-gray-300 hover:bg-gray-100 text-gray-800';
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setError('');
-        const res = await signIn('credentials', {
-            redirect: false,
-            email,
-            password,
-        });
-        if (res?.error) {
-            setError('Invalid email or password');
-        }
-    };
-
     return (
         <div className={`min-h-screen flex items-center justify-center ${bgGradient} transition-colors duration-300`}>
             <div className={`shadow-2xl rounded-2xl p-10 flex flex-col items-center w-full max-w-md border backdrop-blur-md ${cardBg} transition-colors duration-300`}>
@@ -66,6 +56,18 @@ export default function SignIn() {
                         AgileIT</h1>
                 </div>
                 <form onSubmit={handleSubmit} className="w-full flex flex-col gap-5 mb-8">
+                    <div>
+                        <label className={`block font-medium mb-2 ${labelText}`} htmlFor="name">Name</label>
+                        <input
+                            id="name"
+                            type="name"
+                            placeholder="Full Name"
+                            value={name}
+                            onChange={e => setName(e.target.value)}
+                            className={`w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition ${inputBg}`}
+                            required
+                        />
+                    </div>
                     <div>
                         <label className={`block font-medium mb-2 ${labelText}`} htmlFor="email">Email</label>
                         <input
@@ -90,36 +92,26 @@ export default function SignIn() {
                             required
                         />
                     </div>
-                    {error && <div className="text-red-500 text-sm text-center">{error}</div>}
+                    <div>
+                        <label className={`block font-medium mb-2 ${labelText}`} htmlFor="password">Confirm Password</label>
+                        <input
+                            id="confirm_password"
+                            type="password"
+                            placeholder="••••••••"
+                            value={confirmPassword}
+                            onChange={e => setConfirmPassword(e.target.value)}
+                            className={`w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition ${inputBg}`}
+                            required
+                        />
+                    </div>
                     <button
                         type="submit"
-                        className={`cursor-pointer w-full px-4 py-3  hover:from-blue-700 hover:to-purple-700 text-white font-bold rounded-lg shadow-md transition-all duration-200 ${loginBtn}`}
+                        className={`cursor-pointer w-full px-4 py-3  hover:from-blue-700 hover:to-purple-700 text-white font-bold rounded-lg shadow-md transition-all duration-200 ${signUpBtn}`}
                     >
-                        Login
+                        Sign Up
                     </button>
-                    <span className={`m-auto ${labelText}`}>Don't have an account? <Link href={'#'} className='underline'>Sign Up</Link></span>
-                    <div className={`flex flex-row justify-between items-center gap-2 ${labelText}`}>
-                        <hr className='w-full '></hr>
-                        <span>or</span>
-                        <hr className='w-full'></hr>
-                    </div>
                 </form>
-                <div className="w-full flex flex-col gap-4">
-                    <button
-                        onClick={() => signIn('github')}
-                        className={`cursor-pointer w-full flex items-center justify-center gap-2 px-4 py-3 font-semibold rounded-lg shadow transition-all duration-200 ${githubBtn}`}
-                    >
-                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 .5C5.73.5.5 5.73.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.56 0-.28-.01-1.02-.02-2-3.2.7-3.88-1.54-3.88-1.54-.53-1.34-1.3-1.7-1.3-1.7-1.06-.72.08-.71.08-.71 1.17.08 1.78 1.2 1.78 1.2 1.04 1.78 2.73 1.27 3.4.97.11-.75.41-1.27.74-1.56-2.56-.29-5.26-1.28-5.26-5.7 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .98-.31 3.2 1.18a11.1 11.1 0 0 1 2.92-.39c.99.01 1.99.13 2.92.39 2.22-1.49 3.2-1.18 3.2-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.84 1.19 3.1 0 4.43-2.7 5.41-5.27 5.7.42.36.79 1.08.79 2.18 0 1.57-.01 2.84-.01 3.23 0 .31.21.68.8.56C20.71 21.39 24 17.08 24 12c0-6.27-5.23-11.5-12-11.5z" /></svg>
-                        Sign in with GitHub
-                    </button>
-                    <button
-                        onClick={() => signIn('google')}
-                        className={`cursor-pointer w-full flex items-center justify-center gap-2 px-4 py-3 font-semibold rounded-lg shadow transition-all duration-200 ${googleBtn}`}
-                    >
-                        <svg className="w-5 h-5" viewBox="0 0 48 48"><g><path fill="#4285F4" d="M24 9.5c3.54 0 6.7 1.22 9.2 3.23l6.9-6.9C35.6 2.1 30.1 0 24 0 14.8 0 6.7 5.8 2.7 14.1l8.1 6.3C12.7 13.2 17.9 9.5 24 9.5z" /><path fill="#34A853" d="M46.1 24.6c0-1.6-.1-3.1-.4-4.6H24v9h12.4c-.5 2.7-2.1 5-4.5 6.6l7 5.4c4.1-3.8 6.5-9.4 6.5-16.4z" /><path fill="#FBBC05" d="M10.8 28.5c-1.1-3.2-1.1-6.8 0-10l-8.1-6.3C.6 16.1 0 19 0 22s.6 5.9 1.7 8.8l9.1-7.3z" /><path fill="#EA4335" d="M24 48c6.1 0 11.2-2 14.9-5.5l-7-5.4c-2 1.4-4.6 2.3-7.9 2.3-6.1 0-11.3-4.1-13.2-9.6l-9.1 7.3C6.7 42.2 14.8 48 24 48z" /></g></svg>
-                        Sign in with Google
-                    </button>
-                </div>
+                <span className={`m-auto ${labelText}`}>Already have an account? <Link href={'/signIn'} className='underline'>Login</Link></span>
             </div>
         </div>
     )
