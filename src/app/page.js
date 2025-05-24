@@ -36,7 +36,7 @@ export default function Home() {
           <ThemedButton onClick={() => {
             theme == 'light' ? setTheme('dark') : setTheme('light')
           }} label={"Toggle Theme"}/>
-         <ThemedButton onClick={()=>redirect('/dashboard')} label={"Get Started"}/>
+         <ThemedButton onClick={()=>redirect('/app')} label={"Get Started"}/>
         </div>
       </main>
       <section className="flex flex-row row-start-2 p-8 pb-20 sm:p-20 w-full ">
