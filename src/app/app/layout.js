@@ -5,10 +5,12 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes"; // Make sure this is correctly installed and configured
 import { signOut } from "next-auth/react";
+import ThemedButton from "@/components/ThemedButton";
+import { MoonIcon, SunIcon } from "@heroicons/react/24/outline";
 
 export default function AppLayout({ children }) {
   const pathname = usePathname();
-  const { theme } = useTheme(); // ✅ Hook stays at the top level
+  const { theme, setTheme } = useTheme(); // ✅ Hook stays at the top level
   const [mounted, setMounted] = useState(false);
   const [projectId, setProjectId] = useState(null);
 
@@ -54,7 +56,12 @@ export default function AppLayout({ children }) {
             <NavLink href="/app" theme={theme}>Home</NavLink>
             <NavLink href="/app/projects" theme={theme}>Projects</NavLink>
             <NavLink href="/app/settings" theme={theme}>Settings</NavLink>
-            <button className="w-full cursor-pointer bg-transparent text-white text-left" onClick={() => signOut()}>Sign out</button>
+            <button className="w-full cursor-pointer bg-transparent text-left" onClick={() => signOut()}>Sign out</button>
+            <button className="absolute top-8.5 left-8.5 cursor-pointer transition-all duration-500 ease-in" onClick={() => {
+                        theme == 'light' ? setTheme('dark') : setTheme('light')
+                      }}>{
+                        theme == 'light' ? <MoonIcon hanging={'20'} width={'20'}/> : <SunIcon height={'20'} width={'20'}/>
+                      }</button>
           </>
         ) : (
           <>
@@ -77,7 +84,7 @@ export default function AppLayout({ children }) {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-y-auto p-6">
+      <main className={`flex-1 overflow-y-auto p-6 ${headingText}`}>
         <div className="max-w-6xl mx-auto">{children}</div>
       </main>
     </div>

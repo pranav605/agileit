@@ -13,7 +13,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="h-screen">
-      <h1 className=" w-fit text-4xl">Welcome, {session.user?.name}!</h1>
+      <h1 className="w-fit text-4xl">Welcome, {session.user?.name}!</h1>
       <p className="w-fit">This is a protected page only visible to logged-in users.</p>
       <LogoutButton/>
     </div>
