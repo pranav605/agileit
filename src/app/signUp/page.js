@@ -1,6 +1,7 @@
 'use client'
 import { useTheme } from 'next-themes';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
 
 export default function SignUp() {
@@ -11,6 +12,7 @@ export default function SignUp() {
     const [error, setError] = useState('');
     const { theme } = useTheme();
     const [mounted, setMounted] = useState(false);
+    const router = useRouter();
 
     useEffect(() => {
         setMounted(true);
@@ -19,8 +21,61 @@ export default function SignUp() {
     if (!mounted) return null;
 
     const handleSubmit = async (e) => {
+        e.preventDefault();
 
-    }
+        // Clear previous error
+        setError('');
+
+        // Simple client-side validation
+        if (!name || !email || !password || !confirmPassword) {
+            setError('Please fill out all fields.');
+            return;
+        }
+        if (password !== confirmPassword) {
+            setError('Passwords do not match. Please try again.');
+            return;
+        }
+
+        // Construct the payload
+        const formData = {
+            name,
+            email,
+            password,
+        };
+
+        try {
+            const response = await fetch('http://localhost:5000/api/auth/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            });
+
+            console.log("Raw response:", response);
+
+            let data;
+            try {
+                data = await response.json();
+                console.log("Parsed JSON:", data);
+            } catch (jsonErr) {
+                console.error("Failed to parse JSON response:", jsonErr);
+                setError('Invalid JSON response from server.');
+                return;
+            }
+
+            if (!response.ok) {
+                setError(data.message || data.error || 'Something went wrong');
+            } else {
+                // redirect('/signIn');  // useRouter() hook
+                router.push('/signIn');
+            }
+        } catch (err) {
+            setError('Network error. Please try again.');
+            console.error(err);
+        }
+    };
+
 
     const bgGradient = theme === 'dark'
         ? 'bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950'
@@ -110,6 +165,8 @@ export default function SignUp() {
                     >
                         Sign Up
                     </button>
+                    {error && <p className="text-red-500 font-medium m-auto">{error}</p>}
+
                 </form>
                 <span className={`m-auto ${labelText}`}>Already have an account? <Link href={'/signIn'} className='underline'>Login</Link></span>
             </div>
