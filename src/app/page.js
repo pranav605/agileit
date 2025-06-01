@@ -36,40 +36,40 @@ export default function Home() {
           <ThemedButton onClick={() => {
             theme == 'light' ? setTheme('dark') : setTheme('light')
           }} label={"Toggle Theme"}/>
-         <ThemedButton onClick={()=>redirect('/app')} label={"Get Started"}/>
+          <ThemedButton onClick={()=>redirect('/app')} label={"Get Started"}/>
         </div>
       </main>
       <section className="flex flex-row row-start-2 p-8 pb-20 sm:p-20 w-full ">
         <div className="flex flex-1/2 justify-center items-center">
           <div className="flex sm:flex-1/2 flex-col ">
-          <span className="text-2xl font-light pb-8">Ideate, Plan, Execute</span>
-          <h1 className="text-4xl pb-4">Made for comlpex projects and everyday tasks</h1>
-          <p className="pb-8">Discover a sleek, professional platform designed for seamless user experience. This app allows you to collaborate and manage projects and teams.</p>
-          <ul className="pb-8">
-            <li>
-              <span className="flex items-center gap-2">
-                <CheckCircleIcon className="h-8 w-8" /> Sprint Backlog
-              </span>
-            </li>
-            <li>
-              <span className="flex items-center gap-2">
-                <CheckCircleIcon className="h-8 w-8" /> Task Tracker
-              </span>
-            </li>
-            <li>
-              <span className="flex items-center gap-2">
-                <CheckCircleIcon className="h-8 w-8" /> Easy Project Creation
-              </span>
-            </li>
-          </ul>
-          <button className={clsx("cursor-pointer rounded-md py-2 px-4 max-w-fit border border-transparent text-center text-sm text-white transition-all shadow-md hover:shadow-lg  active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none",
-          {
-            " bg-slate-800 focus:bg-slate-700 focus:shadow-none active:bg-slate-700 hover:bg-slate-700": theme === 'light',
-            " bg-blue-800 focus:bg-blue-700 focus:shadow-none active:bg-blue-700 hover:bg-blue-700": theme === 'dark',
-          })}>
-            Get Started
-          </button>
-        </div>
+            <span className="text-2xl font-light pb-8">Ideate, Plan, Execute</span>
+            <h1 className="text-4xl pb-4">Made for comlpex projects and everyday tasks</h1>
+            <p className="pb-8">Discover a sleek, professional platform designed for seamless user experience. This app allows you to collaborate and manage projects and teams.</p>
+            <ul className="pb-8">
+              <li>
+                <span className="flex items-center gap-2">
+                  <CheckCircleIcon className="h-8 w-8" /> Sprint Backlog
+                </span>
+              </li>
+              <li>
+                <span className="flex items-center gap-2">
+                  <CheckCircleIcon className="h-8 w-8" /> Task Tracker
+                </span>
+              </li>
+              <li>
+                <span className="flex items-center gap-2">
+                  <CheckCircleIcon className="h-8 w-8" /> Easy Project Creation
+                </span>
+              </li>
+            </ul>
+            <button className={clsx("cursor-pointer rounded-md py-2 px-4 max-w-fit border border-transparent text-center text-sm text-white transition-all shadow-md hover:shadow-lg  active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none",
+              {
+                " bg-slate-800 focus:bg-slate-700 focus:shadow-none active:bg-slate-700 hover:bg-slate-700": theme === 'light',
+                " bg-blue-800 focus:bg-blue-700 focus:shadow-none active:bg-blue-700 hover:bg-blue-700": theme === 'dark',
+              })}>
+              Get Started
+            </button>
+          </div>
         </div>
         <div className="hidden sm:flex flex-1/2">
           <Image src={'/images/project_board_bg.png'} width="1024" height={1024} alt="Project management board" className="h-full w-full"></Image>
