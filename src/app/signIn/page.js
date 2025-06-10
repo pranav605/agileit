@@ -48,7 +48,7 @@ export default function SignIn() {
         e.preventDefault();
         setError('');
         const res = await signIn('credentials', {
-            redirect: false,
+            redirect: true,
             email,
             password,
         });
