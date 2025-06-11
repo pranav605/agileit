@@ -12,7 +12,7 @@ export default function ThemedButton({ onClick, type, className, label}) {
                       {
                         " bg-slate-800 focus:bg-slate-700 focus:shadow-none active:bg-slate-700 hover:bg-slate-700": theme === 'light',
                         " bg-blue-800 focus:bg-blue-700 focus:shadow-none active:bg-blue-700 hover:bg-blue-700": theme === 'dark',
-                      })}
+                      },className)}
         >
             {label}
         </button>
