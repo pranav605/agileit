@@ -46,6 +46,9 @@ export const authOptions = {
   pages: {
     signIn: '/signIn'
   },
+  session:{
+    strategy: 'jwt',
+  },
   callbacks: {
      async jwt({ token, user }) {
       // Log the user object received by the jwt callback
@@ -54,6 +57,7 @@ export const authOptions = {
         token.id = user._id || user.id; // supports both MongoDB _id and OAuth id
         token.name = user.name;
         token.email = user.email;
+        token.picture = user.image;
       }
       // Log the token after modification
       console.log("Token after jwt callback:", token);
@@ -66,6 +70,7 @@ export const authOptions = {
       session.user.id = token.id;
       session.user.name = token.name;
       session.user.email = token.email;
+      session.user.image = token.picture;
       // Log the session after modification
       console.log("Session after session callback:", session);
       return session;

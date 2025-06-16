@@ -17,9 +17,6 @@ export default function Settings() {
 
   if (!mounted) return null;
 
-  const headingText = theme === 'dark'
-    ? 'text-gray-100'
-    : 'text-gray-900';
   // Show a loading state while the session is being fetched.
   if (status === 'loading') {
     return (
@@ -32,12 +29,9 @@ export default function Settings() {
     return (
       <div className='w-full h-full'>
         <div className='flex flex-col'>
-          <h1 className={`text-4xl font-extrabold mb-8 tracking-tight ${headingText}`}>Settings</h1>
+          <h1 className={`text-4xl font-extrabold mb-8 tracking-tight text-gray-900 dark:text-gray-100`}>Settings</h1>
           <div className='divide-y divide-zinc-400'>
-            <div className={clsx('flex flex-row items-center justify-between px-4 h-16 border border-gray-200 rounded-md',{
-              "border-zinc-800":theme==='dark',
-              "border-gray-200":theme==='light',
-            })}>
+            <div className='flex flex-row items-center justify-between px-4 h-16 border border-zinc-200 dark:border-zinc-800 rounded-md'>
               <span>Dark Theme</span>
               <ThemedToggleSwitch
                 checked={theme === 'dark'}

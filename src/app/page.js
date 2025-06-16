@@ -20,8 +20,8 @@ export default function Home() {
   return (
     <div className={clsx(" items-center justify-items-start min-h-screen font-[family-name:var(--font-geist-sans)]",
       {
-        "light": theme === 'light',
-        "dark": theme === 'dark',
+        // "light": theme === 'light',
+        // "dark": theme === 'dark',
       }
     )}>
       <main className={clsx("flex w-full flex-col sm:h-screen p-8 pb-20  sm:p-20 gap-[16px] md:gap-[32px] row-start-2  justify-center sm:items-start",

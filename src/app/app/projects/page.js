@@ -7,9 +7,6 @@ import React, { useEffect, useState } from 'react'
 
 export default function Projects() {
   const { theme } = useTheme();
-  const headingText = theme === 'dark'
-    ? 'text-gray-100'
-    : 'text-gray-900';
   const [mounted, setMounted] = useState(false);
   const { data: session, status } = useSession();
 
@@ -89,7 +86,7 @@ export default function Projects() {
   return (
     <div className='w-full h-full'>
       <div className='flex flex-col'>
-        <h1 className={`text-4xl font-extrabold mb-8 tracking-tight ${headingText}`}>Projects</h1>
+        <h1 className={`text-4xl font-extrabold mb-8 tracking-tight`}>Projects</h1>
         <form className='flex flex-row justify-around items-center mb-4'>
           <input
             type='text'
@@ -102,7 +99,7 @@ export default function Projects() {
         </form>
         <div className='grid grid-cols-3 gap-2 mt-4'>
           <button
-            className='cursor-pointer flex flex-col items-center justify-center h-24 w-full rounded-md border-2 border-dashed border-gray-300 dark:border-zinc-700 text-gray-400 hover:border-blue-500 hover:text-blue-500 transition-colors'
+            className='cursor-pointer flex flex-col items-center justify-center h-24 w-full rounded-md border-2 border-dashed border-gray-300 dark:border-zinc-700  hover:border-blue-500 hover:text-blue-500 transition-colors'
             onClick={() => setShowModal(true)}
             type="button"
           >
@@ -113,7 +110,7 @@ export default function Projects() {
           {projects.map(project => (
             <div
               key={project.id}
-              className='cursor-pointer h-24 w-full rounded-md border border-gray-200 dark:border-zinc-800 flex flex-col items-center justify-center text-lg font-medium bg-white dark:bg-zinc-900 p-2'
+              className='cursor-pointer h-24 w-full rounded-md border border-gray-200 dark:border-zinc-800 flex flex-col items-center justify-center text-lg font-medium p-2'
             >
               <div>{project.name}</div>
               <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
