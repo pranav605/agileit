@@ -4,10 +4,13 @@ import clsx from 'clsx';
 import { useSession } from 'next-auth/react';
 import { useTheme } from 'next-themes'
 import React, { useEffect, useState } from 'react'
+import MemberSelector from '@/components/MemberSelector';
+import axios from 'axios';
 
 export default function Projects() {
   const { theme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const [projects, setProjects] = useState([]);
   const { data: session, status } = useSession();
 
   // Modal state
@@ -22,26 +25,22 @@ export default function Projects() {
 
   useEffect(() => {
     setMounted(true);
+    const fetchProjects = async ()=>{
+      const projects = await axios.get('http://localhost:5000/api/projects/');
+      setProjects(projects.data);
+    }
+    fetchProjects();
   }, []);
 
-  useEffect(()=>{
-    if(session){
-      setForm(prev=>({
+  useEffect(() => {
+    if (session) {
+      setForm(prev => ({
         ...prev, createdBy: session?.user?.id
       }))
     }
-  },[session]);
+  }, [session]);
 
   if (!mounted) return null;
-
-  // Dummy projects array
-  const projects = [
-    { id: 1, name: 'Project Alpha', description: 'A project about alpha testing.' },
-    { id: 2, name: 'Project Beta', description: 'Beta phase project for new features.' },
-    { id: 3, name: 'Project Gamma', description: 'Gamma release management tool.' },
-    { id: 4, name: 'Project Delta', description: 'Delta process improvement initiative.' },
-    { id: 5, name: 'Project Epsilon', description: 'Epsilon analytics dashboard.' },
-  ];
 
   const handleFormChange = (e) => {
     const { name, value } = e.target;
@@ -70,17 +69,37 @@ export default function Projects() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // TODO: Send form data to backend
-    setShowModal(false);
-    setForm({
-      name: '',
-      description: '',
-      createdBy: '',
-      members: [{ user: '', role: 'viewer' }],
-      numberOfSprints: '',
-    });
+
+    try {
+      const res = await fetch('http://localhost:5000/api/projects/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(form),
+      });
+
+      if (!res.ok) {
+        throw new Error('Failed to create project');
+      }
+
+      const newProject = await res.json();
+
+      // Reset form and close modal
+      setShowModal(false);
+      setForm({
+        name: '',
+        description: '',
+        createdBy: '',
+        members: [{ user: '', role: 'viewer' }],
+        numberOfSprints: '',
+      });
+    } catch (error) {
+      console.error('Error creating project:', error);
+      alert('Error creating project. Please try again.');
+    }
   };
 
   return (
@@ -95,7 +114,7 @@ export default function Projects() {
             placeholder='Search a project'
             className='px-4 py-2 flex-2/3 rounded-md border border-gray-200 dark:border-zinc-800'
           />
-          <ThemedButton type={'submit'} label={'Search'} className={''}/>
+          <ThemedButton type={'submit'} label={'Search'} className={''} />
         </form>
         <div className='grid grid-cols-3 gap-2 mt-4'>
           <button
@@ -107,9 +126,9 @@ export default function Projects() {
             <span className="text-sm">Create Project</span>
           </button>
           {/* Project Cards */}
-          {projects.map(project => (
+          {projects.map((project,idx) => (
             <div
-              key={project.id}
+              key={idx}
               className='cursor-pointer h-24 w-full rounded-md border border-gray-200 dark:border-zinc-800 flex flex-col items-center justify-center text-lg font-medium p-2'
             >
               <div>{project.name}</div>
@@ -123,7 +142,7 @@ export default function Projects() {
 
       {/* Modal */}
       {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-200/50 dark:bg-black/50">
           <div className="bg-white dark:bg-zinc-900 rounded-lg p-6 w-full max-w-lg shadow-lg">
             <h2 className="text-xl font-bold mb-4">Create Project</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -135,7 +154,7 @@ export default function Projects() {
                   required
                   value={form.name}
                   onChange={handleFormChange}
-                  className="w-full px-3 py-2 border border-gray-200 dark:border-zinc-800 rounded-md"
+                  className="w-full px-3 py-2 border border-gray-200 dark:border-zinc-700 rounded-md"
                 />
               </div>
               <div>
@@ -144,11 +163,11 @@ export default function Projects() {
                   name="description"
                   value={form.description}
                   onChange={handleFormChange}
-                  className="w-full px-3 py-2 border border-gray-200 dark:border-zinc-800 rounded-md"
+                  className="w-full px-3 py-2 border border-gray-200 dark:border-zinc-700 rounded-md max-h-16"
                 />
               </div>
               <div>
-                <label className="block mb-1 font-medium">Created By (User ID) *</label>
+                <label className="hidden mb-1 font-medium">Created By (User ID) *</label>
                 <input
                   type="text"
                   name="createdBy"
@@ -156,24 +175,24 @@ export default function Projects() {
                   required
                   value={form.createdBy}
                   onChange={handleFormChange}
-                  className="w-full px-3 py-2 border border-gray-200 dark:border-zinc-800 rounded-md disabled:text-zinc-600"
+                  className="w-full px-3 py-2 border hidden border-gray-200 dark:border-zinc-700 rounded-md disabled:text-zinc-600"
                 />
               </div>
               <div>
                 <label className="block mb-1 font-medium">Members</label>
                 {form.members.map((member, idx) => (
                   <div key={idx} className="flex items-center gap-2 mb-2">
-                    <input
-                      type="text"
-                      placeholder="User ID"
-                      value={member.user}
-                      onChange={e => handleMemberChange(idx, 'user', e.target.value)}
-                      className="px-2 py-1 border border-gray-200 dark:border-zinc-800 rounded-md"
+                    <MemberSelector
+                      member={member}
+                      currentEmail = {session?.user?.email}
+                      index={idx}
+                      onChange={handleMemberChange}
+                      onRemove={removeMember}
                     />
                     <select
                       value={member.role}
                       onChange={e => handleMemberChange(idx, 'role', e.target.value)}
-                      className="px-2 py-1 border border-gray-200 dark:border-zinc-800 rounded-md"
+                      className="px-2 py-1 border border-gray-200 dark:border-zinc-700 rounded-md"
                     >
                       <option value="admin">admin</option>
                       <option value="editor">editor</option>
@@ -193,13 +212,13 @@ export default function Projects() {
                   name="numberOfSprints"
                   value={form.numberOfSprints}
                   onChange={handleFormChange}
-                  className="w-full px-3 py-2 border border-gray-200 dark:border-zinc-800 rounded-md"
+                  className="w-full px-3 py-2 border border-gray-200 dark:border-zinc-700 rounded-md"
                   min={0}
                 />
               </div>
               <div className="flex justify-end gap-2 mt-4">
-                <button type="button" onClick={() => setShowModal(false)} className="px-4 py-2 rounded bg-gray-200 dark:bg-zinc-700">Cancel</button>
-                <ThemedButton type="submit" label="Create" className="" />
+                <button type="button" onClick={() => setShowModal(false)} className="cursor-pointer px-4 py-2 rounded bg-gray-200 dark:bg-zinc-700">Cancel</button>
+                <ThemedButton type="submit" label="Create" className="cursor-pointer" />
               </div>
             </form>
           </div>

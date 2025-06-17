@@ -16,23 +16,23 @@ export default function DashboardPage() {
     }
   }, [status, router]);
 
-  useEffect(() => {
-    if (session?.user) {
-      const syncUser = async () => {
-        try {
-          await axios.post("http://localhost:5000/api/auth/sync", {
-            email: session.user.email,
-            name: session.user.name,
-            image: session.user.image,
-            provider: session.user.provider || 'unknown',
-          });
-        } catch (err) {
-          console.error("User sync failed:", err);
-        }
-      };
-      syncUser();
-    }
-  }, [session]);
+  // useEffect(() => {
+  //   if (session?.user) {
+  //     const syncUser = async () => {
+  //       try {
+  //         await axios.post("http://localhost:5000/api/auth/sync", {
+  //           email: session.user.email,
+  //           name: session.user.name,
+  //           image: session.user.image,
+  //           provider: session.user.provider || 'unknown',
+  //         });
+  //       } catch (err) {
+  //         console.error("User sync failed:", err);
+  //       }
+  //     };
+  //     syncUser();
+  //   }
+  // }, [session]);
 
   if (status === "loading" || status === "unauthenticated") {
     return <p>Loading...</p>;

@@ -46,21 +46,30 @@ export const authOptions = {
   pages: {
     signIn: '/signIn'
   },
-  session:{
+  session: {
     strategy: 'jwt',
   },
   callbacks: {
-     async jwt({ token, user }) {
-      // Log the user object received by the jwt callback
-      console.log("User object in jwt callback:", user);
-      if (user) {
-        token.id = user._id || user.id; // supports both MongoDB _id and OAuth id
-        token.name = user.name;
-        token.email = user.email;
-        token.picture = user.image;
+    async jwt({ token, user, account }) {
+      if (account?.provider === 'google' || account?.provider === 'github') {
+        try {
+          const res = await axios.post('http://localhost:5000/api/auth/sync', {
+            email: token.email,
+            name: token.name,
+            image: token.picture,
+            provider: account.provider
+          });
+
+          token.id = res.data.id;
+        } catch (err) {
+          console.error("SSO sync error:", err);
+        }
       }
-      // Log the token after modification
-      console.log("Token after jwt callback:", token);
+
+      if (user?._id) {
+        token.id = user._id;
+      }
+
       return token;
     },
 
