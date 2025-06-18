@@ -6,9 +6,9 @@ import { useTheme } from 'next-themes'
 import React, { useEffect, useState } from 'react'
 import MemberSelector from '@/components/MemberSelector';
 import axios from 'axios';
+import Link from 'next/link';
 
 export default function Projects() {
-  const { theme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [projects, setProjects] = useState([]);
   const { data: session, status } = useSession();
@@ -25,7 +25,7 @@ export default function Projects() {
 
   useEffect(() => {
     setMounted(true);
-    const fetchProjects = async ()=>{
+    const fetchProjects = async () => {
       const projects = await axios.get('http://localhost:5000/api/projects/');
       setProjects(projects.data);
     }
@@ -86,7 +86,8 @@ export default function Projects() {
       }
 
       const newProject = await res.json();
-
+      // Update projects state with new project
+      setProjects(prev => [...prev, newProject]);
       // Reset form and close modal
       setShowModal(false);
       setForm({
@@ -126,8 +127,9 @@ export default function Projects() {
             <span className="text-sm">Create Project</span>
           </button>
           {/* Project Cards */}
-          {projects.map((project,idx) => (
-            <div
+          {projects.map((project, idx) => (
+            <Link
+              href={`/app/projects/${project._id}`}
               key={idx}
               className='cursor-pointer h-24 w-full rounded-md border border-gray-200 dark:border-zinc-800 flex flex-col items-center justify-center text-lg font-medium p-2'
             >
@@ -135,7 +137,7 @@ export default function Projects() {
               <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                 {project.description || 'No description'}
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>
@@ -184,7 +186,7 @@ export default function Projects() {
                   <div key={idx} className="flex items-center gap-2 mb-2">
                     <MemberSelector
                       member={member}
-                      currentEmail = {session?.user?.email}
+                      currentEmail={session?.user?.email}
                       index={idx}
                       onChange={handleMemberChange}
                       onRemove={removeMember}
