@@ -134,7 +134,7 @@ export default function Projects() {
               className='cursor-pointer h-24 w-full rounded-md border border-gray-200 dark:border-zinc-800 flex flex-col items-center justify-center text-lg font-medium p-2'
             >
               <div>{project.name}</div>
-              <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 text-center">
                 {project.description || 'No description'}
               </div>
             </Link>

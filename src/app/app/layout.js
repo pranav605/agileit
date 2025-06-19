@@ -68,9 +68,8 @@ export default function AppLayout({ children }) {
                 AgileIT</h1>
             </div>
             <NavLink href={`/app/projects/${projectId}`}>Overview</NavLink>
+            <NavLink href={`/app/projects/${projectId}/tasks`}>Tasks</NavLink>
             <NavLink href={`/app/projects/${projectId}/boards`}>Boards</NavLink>
-            <NavLink href={`/app/projects/${projectId}/issues`}>Issues</NavLink>
-            <NavLink href={`/app/projects/${projectId}/sprints`}>Sprints</NavLink>
             <NavLink href={`/app/projects/${projectId}/team`}>Team Members</NavLink>
             <NavLink href={`/app/projects/${projectId}/settings`}>Settings</NavLink>
             <NavLink

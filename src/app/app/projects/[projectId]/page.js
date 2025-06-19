@@ -31,8 +31,8 @@ export default function ProjectPage() {
 
   return (
     <div className="w-full h-full">
-      <h1 className="text-4xl font-bold mb-4">{project.name}</h1>
-      <p className="text-lg text-gray-700">{project.description}</p>
+      <h1 className="text-4xl font-extrabold mb-8 tracking-tight text-gray-900 dark:text-gray-100">{project.name}</h1>
+      <p className="text-lg text-gray-700 dark:text-gray-200">{project.description}</p>
       {/* Add more project fields here if needed */}
     </div>
   );
