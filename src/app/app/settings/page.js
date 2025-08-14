@@ -31,7 +31,7 @@ export default function Settings() {
       <div className='flex flex-col'>
         <h1 className={`text-4xl font-extrabold mb-8 tracking-tight text-gray-900 dark:text-gray-100`}>Settings</h1>
         {/* User Info Section */}
-        <div className="flex items-center space-x-4 mb-8 p-4 border border-zinc-200 dark:border-zinc-800 rounded-md dark:bg-zinc-900">
+        <div className="flex items-center space-x-4 mb-4 p-4 border border-zinc-200 dark:border-zinc-800 rounded-md dark:bg-zinc-900">
         {session?.user?.image && (
           <img
           src={session.user.image}
