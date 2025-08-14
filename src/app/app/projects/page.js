@@ -7,11 +7,31 @@ import React, { useEffect, useState } from 'react'
 import MemberSelector from '@/components/MemberSelector';
 import axios from 'axios';
 import Link from 'next/link';
+import { TrashIcon } from '@heroicons/react/24/outline';
 
 export default function Projects() {
   const [mounted, setMounted] = useState(false);
   const [projects, setProjects] = useState([]);
   const { data: session, status } = useSession();
+  const [deleteProject, setDeleteProject] = useState(null);
+
+  const handleDeleteModal = (event, project) => {
+    event.stopPropagation();
+    setShowModal(false);
+    setDeleteProject(project);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteProject) return;
+
+    try {
+      // await axios.delete(`http://localhost:5000/api/projects/${deleteProject._id}`);
+      setProjects(prev => prev.filter(p => p._id !== deleteProject._id));
+      setDeleteProject(null);
+    } catch (error) {
+      console.error("Error deleting project:", error);
+    }
+  };
 
   // Modal state
   const [showModal, setShowModal] = useState(false);
@@ -103,6 +123,7 @@ export default function Projects() {
     }
   };
 
+
   return (
     <div className='w-full h-full'>
       <div className='flex flex-col'>
@@ -128,16 +149,23 @@ export default function Projects() {
           </button>
           {/* Project Cards */}
           {projects.map((project, idx) => (
-            <Link
-              href={`/app/projects/${project._id}`}
+            <div
               key={idx}
-              className='cursor-pointer h-24 w-full rounded-md border border-gray-200 dark:border-zinc-800 flex flex-col items-center justify-center text-lg font-medium p-2'
+              className='cursor-pointer h-24 w-full rounded-md border border-gray-200 relative dark:border-zinc-800 flex flex-col items-center justify-center text-lg font-medium p-2 z-20'
             >
-              <div>{project.name}</div>
-              <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 text-center">
-                {project.description || 'No description'}
+              <Link href={`/app/projects/${project._id}`} className='flex flex-col items-center justify-center text-lg font-medium p-2 z-20'>
+                <div>{project.name}</div>
+                <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 text-center">
+                  {(project.description && project.description.length > 150)
+                    ? project.description.slice(0, 150) + '...'
+                    : (project.description || 'No description')}
+                </div>
+              </Link>
+              <div className="absolute top-2 right-2 z-50">
+                <TrashIcon height={16} width={16} className='hover:text-red-600' onClick={(e) => handleDeleteModal(e, project)} />
               </div>
-            </Link>
+
+            </div>
           ))}
         </div>
       </div>
@@ -201,7 +229,7 @@ export default function Projects() {
                       <option value="viewer">viewer</option>
                     </select>
                     {form.members.length > 1 && (
-                      <button type="button" onClick={() => removeMember(idx)} className="text-red-500">Remove</button>
+                      <button type="button" onClick={() => removeMember(idx)} className="text-red-600">Remove</button>
                     )}
                   </div>
                 ))}
@@ -226,6 +254,31 @@ export default function Projects() {
           </div>
         </div>
       )}
+
+      {/* Delete Modal */}
+      {deleteProject && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-200/50 dark:bg-black/50">
+          <div className="bg-white dark:bg-zinc-900 rounded-lg p-6 w-full max-w-lg shadow-lg">
+            <p>Are you sure you want to delete <b>{deleteProject.name}</b>?</p>
+            <div className="flex justify-end gap-2 mt-4">
+              <button
+                type="button"
+                onClick={() => setDeleteProject(null)}
+                className="cursor-pointer px-4 py-2 rounded bg-gray-200 dark:bg-zinc-700"
+              >
+                Cancel
+              </button>
+              <ThemedButton
+                type="button"
+                label="Delete"
+                className="cursor-pointer"
+                onClick={handleDeleteConfirm}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   )
 }
