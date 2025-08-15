@@ -8,6 +8,7 @@ import MemberSelector from '@/components/MemberSelector';
 import axios from 'axios';
 import Link from 'next/link';
 import { TrashIcon } from '@heroicons/react/24/outline';
+import { data } from 'autoprefixer';
 
 export default function Projects() {
   const [mounted, setMounted] = useState(false);
@@ -46,11 +47,12 @@ export default function Projects() {
   useEffect(() => {
     setMounted(true);
     const fetchProjects = async () => {
-      const projects = await axios.get('http://localhost:5000/api/projects/');
+      const projects = await axios.get('http://localhost:5000/api/projects/user/'+session.user.id);
       setProjects(projects.data);
     }
+    if(session)
     fetchProjects();
-  }, []);
+  }, [session]);
 
   useEffect(() => {
     if (session) {
