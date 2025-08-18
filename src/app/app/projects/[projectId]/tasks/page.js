@@ -1,5 +1,7 @@
 'use client'
 import ThemedButton from '@/components/ThemedButton'
+import ThemedSelect from '@/components/ThemedSelect'
+import { useProject } from '@/contexts/ProjectContext'
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline'
 import React, { useState } from 'react'
 
@@ -10,22 +12,74 @@ const mockTasks = [
 
 export default function Tasks() {
     const [createModal, setCreateModal] = useState(false);
+    const { projectId } = useProject();
 
     const [form, setForm] = useState({
-        tags: ['a','b']
+        title: '',
+        description: '',
+        status: 'todo',
+        priority: 'medium',
+        dueDate: '',
+        assignedTo: '',
+        project: projectId,
+        sprint: 0,
+        tags: ['a', 'b'],
     });
 
-    const handleFormChange = (e)=>{
-
-    }
-
-    const handleSubmit = (e)=>{
+    // Handles normal input/select changes
+    const handleFormChange = (e) => {
+        const name = e.target ? e.target.name : 'status';
+        const value = e.target ? e.target.value : e.value;
         
-    }
+        setForm((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+    };
 
+    
+
+    // Special handler for tags (comma separated string → array)
     const handleTagsChange = (e) => {
+        const input = e.target.value;
+        const tagsArray = input
+            .split(',')
+            .map((tag) => tag.trim())
+            .filter(Boolean);
 
-    }
+        setForm((prev) => ({
+            ...prev,
+            tags: tagsArray,
+        }));
+    };
+
+    // Handles form submission
+    const handleSubmit = (e) => {
+        e.preventDefault();
+
+        if (!form.title || !form.project) {
+            alert('Title and Project are required.');
+            return;
+        }
+
+        // For now just log it — later hook up to API
+        console.log('New Task Created:', form);
+
+        // Reset form after submit
+        setForm({
+            title: '',
+            description: '',
+            status: 'todo',
+            priority: 'medium',
+            dueDate: '',
+            assignedTo: '',
+            project: projectId,
+            sprint: 0,
+            tags: [],
+        });
+
+        setCreateModal(false);
+    };
     return (
         <div className='w-full h-full'>
             <div className='flex flex-col text-gray-500 dark:text-gray-300'>
@@ -36,19 +90,19 @@ export default function Tasks() {
                 <div className='p-4 border border-zinc-200 dark:border-zinc-800 rounded min-h-14'>
                     <div className='flex flex-row justify-between items-center mb-4'>
                         <div className='flex divide-x text-sm divide-gray-200 h-10 dark:divide-zinc-800 rounded border border-gray-200 dark:border-zinc-800 text-gray-500 dark:text-gray-300' >
-                            <div className='px-4 py-2 flex justify-center items-center cursor-pointer hover:bg-gray-100'>
+                            <div className='px-4 py-2 flex justify-center items-center cursor-pointer hover:bg-gray-100 hover:dark:bg-gray-800 '>
                                 <span>View all</span>
                             </div>
-                            <div className='px-2 py-4 flex justify-center items-center cursor-pointer hover:bg-gray-100'>
+                            <div className='px-2 py-4 flex justify-center items-center cursor-pointer hover:bg-gray-100 hover:dark:bg-gray-800' >
                                 <span>New</span>
                             </div>
-                            <div className='px-2 py-4 flex justify-center items-center cursor-pointer hover:bg-gray-100'>
+                            <div className='px-2 py-4 flex justify-center items-center cursor-pointer hover:bg-gray-100 hover:dark:bg-gray-800'>
                                 <span>In Progress</span>
                             </div>
-                            <div className='px-2 py-4 flex justify-center items-center cursor-pointer hover:bg-gray-100'>
+                            <div className='px-2 py-4 flex justify-center items-center cursor-pointer hover:bg-gray-100 hover:dark:bg-gray-800'>
                                 <span>Done</span>
                             </div>
-                            <div className='px-2 py-4 flex justify-center items-center cursor-pointer hover:bg-gray-100'>
+                            <div className='px-2 py-4 flex justify-center items-center cursor-pointer hover:bg-gray-100 hover:dark:bg-gray-800'>
                                 <span>Assigned to you</span>
                             </div>
                         </div>
@@ -133,7 +187,7 @@ export default function Tasks() {
                             </div>
                             <div>
                                 <label className="block mb-1 font-medium">Status</label>
-                                <select
+                                {/* <select
                                     name="status"
                                     value={form.status}
                                     onChange={handleFormChange}
@@ -142,7 +196,8 @@ export default function Tasks() {
                                     <option value="todo">To Do</option>
                                     <option value="in-progress">In Progress</option>
                                     <option value="done">Done</option>
-                                </select>
+                                </select> */}
+                                <ThemedSelect options={[{value:'todo',label:'To Do'},{value:'in-progress',label:'In Progress'},{value:'done',label:'Done'}]} onChange={(e)=>handleFormChange(e)} value={form.status} name={'status'}/>
                             </div>
                             <div>
                                 <label className="block mb-1 font-medium">Priority</label>
@@ -182,7 +237,7 @@ export default function Tasks() {
                                 <input
                                     type="text"
                                     name="project"
-                                    required
+                                    disabled
                                     value={form.project}
                                     onChange={handleFormChange}
                                     className="w-full px-3 py-2 border border-gray-200 dark:border-zinc-700 rounded-md"
