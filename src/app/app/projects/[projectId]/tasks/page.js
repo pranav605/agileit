@@ -1,9 +1,12 @@
 'use client'
+import TaskMemberSelector from '@/components/TaskMemberSelector'
 import ThemedButton from '@/components/ThemedButton'
 import ThemedSelect from '@/components/ThemedSelect'
 import { useProject } from '@/contexts/ProjectContext'
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline'
-import React, { useState } from 'react'
+import axios from 'axios'
+import { useSession } from 'next-auth/react'
+import React, { useEffect, useState } from 'react'
 
 // Updated mockTasks based on the provided schema
 const mockTasks = [
@@ -12,32 +15,48 @@ const mockTasks = [
 
 export default function Tasks() {
     const [createModal, setCreateModal] = useState(false);
+    const [tasks, setTasks] = useState([]);
     const { projectId } = useProject();
-
+    const { data: session, status } = useSession();
     const [form, setForm] = useState({
         title: '',
         description: '',
         status: 'todo',
         priority: 'medium',
         dueDate: '',
-        assignedTo: '',
+        assignedToId: '',
         project: projectId,
         sprint: 0,
         tags: ['a', 'b'],
     });
 
+    useEffect(() => {
+        setForm(prev => ({ ...prev, createdBy: session?.user?.id }))
+    }, [session]);
+
+    useEffect(() => {
+        const fetchTasks = async () => {
+            const tasks = await axios.get('http://localhost:5000/api/tasks/project/' + projectId);
+            setTasks(tasks.data);
+            console.log(tasks.data);
+            
+        }
+        if (session)
+            fetchTasks();
+    }, [session])
+
     // Handles normal input/select changes
     const handleFormChange = (e) => {
         const name = e.target ? e.target.name : 'status';
         const value = e.target ? e.target.value : e.value;
-        
+
         setForm((prev) => ({
             ...prev,
             [name]: value,
         }));
     };
 
-    
+
 
     // Special handler for tags (comma separated string → array)
     const handleTagsChange = (e) => {
@@ -54,7 +73,7 @@ export default function Tasks() {
     };
 
     // Handles form submission
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
         if (!form.title || !form.project) {
@@ -62,34 +81,64 @@ export default function Tasks() {
             return;
         }
 
-        // For now just log it — later hook up to API
-        console.log('New Task Created:', form);
+        try {
 
-        // Reset form after submit
-        setForm({
-            title: '',
-            description: '',
-            status: 'todo',
-            priority: 'medium',
-            dueDate: '',
-            assignedTo: '',
-            project: projectId,
-            sprint: 0,
-            tags: [],
-        });
+            const res = await fetch('http://localhost:5000/api/tasks/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(form),
+            });
 
-        setCreateModal(false);
+            if (!res.ok) {
+                throw new Error('Failed to create task');
+            }
+
+            const newTask = await res.json();
+            // // Update projects state with new task
+            const fetchTasks = async () => {
+                const tasks = await axios.get('http://localhost:5000/api/tasks/project/' + projectId);
+                
+                setTasks(tasks.data);
+            }
+            fetchTasks();
+            
+            // Reset form after submit
+            setForm({
+                title: '',
+                description: '',
+                status: 'todo',
+                priority: 'medium',
+                dueDate: '',
+                assignedToId: '',
+                project: projectId,
+                sprint: 0,
+                tags: [],
+            });
+
+            setCreateModal(false);
+        } catch (err) {
+            console.error('Error creating task:', err);
+            alert('Error creating task. Please try again.');
+        }
     };
+
+    const handleAssigneeChange = (value) => {
+        setForm(prev => ({
+            ...prev, assignedToId: value,
+        }))
+    }
     return (
         <div className='w-full h-full'>
-            <div className='flex flex-col text-gray-500 dark:text-gray-300'>
+            <div className='flex flex-col text-gray-900 dark:text-gray-300'>
                 <div className='flex flex-row justify-between'>
                     <h1 className='text-4xl font-extrabold mb-8 tracking-tight text-gray-900 dark:text-gray-100'>Tasks</h1>
-                    <ThemedButton type={'button'} label={'Create new task'} className={'h-12'} onClick={(e)=>setCreateModal(true)}/>
+                    <ThemedButton type={'button'} label={'Create new task'} className={'h-12'} onClick={(e) => setCreateModal(true)} />
                 </div>
                 <div className='p-4 border border-zinc-200 dark:border-zinc-800 rounded min-h-14'>
                     <div className='flex flex-row justify-between items-center mb-4'>
-                        <div className='flex divide-x text-sm divide-gray-200 h-10 dark:divide-zinc-800 rounded border border-gray-200 dark:border-zinc-800 text-gray-500 dark:text-gray-300' >
+                        <div className='flex divide-x text-sm divide-gray-200 h-10 dark:divide-zinc-800 rounded border border-gray-200 dark:border-zinc-800 text-gray-900 dark:text-gray-300' >
                             <div className='px-4 py-2 flex justify-center items-center cursor-pointer hover:bg-gray-100 hover:dark:bg-gray-800 '>
                                 <span>View all</span>
                             </div>
@@ -114,7 +163,7 @@ export default function Tasks() {
                                 placeholder='Search a task'
                                 className='px-4 py-2 flex-2/3 rounded-md border border-gray-200 dark:border-zinc-800 '
                             />
-                            <button type='submit' className='p-3 ml-2 text-sm rounded-md border border-gray-200 dark:border-zinc-800 cursor-pointer'><MagnifyingGlassIcon height={16} width={16}/></button>
+                            <button type='submit' className='p-3 ml-2 text-sm rounded-md border border-gray-200 dark:border-zinc-800 cursor-pointer'><MagnifyingGlassIcon height={16} width={16} /></button>
                         </form>
                     </div>
                     <div className='flex flex-col'>
@@ -123,18 +172,19 @@ export default function Tasks() {
                                 <table className='min-w-full'>
                                     <thead className='h-10 bg-gray-100 dark:bg-zinc-800'>
                                         <tr>
-                                            <th className='px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase'>Title</th>
-                                            <th className='px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase'>Status</th>
-                                            <th className='px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase'>Priority</th>
-                                            <th className='px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase'>Due Date</th>
-                                            <th className='px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase'>Assignee</th>
-                                            <th className='px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase'>Tags</th>
+                                            <th className='px-4 py-2 text-left text-xs font-medium text-gray-900 dark:text-gray-300 uppercase'>Title</th>
+                                            <th className='px-4 py-2 text-left text-xs font-medium text-gray-900 dark:text-gray-300 uppercase'>Status</th>
+                                            <th className='px-4 py-2 text-left text-xs font-medium text-gray-900 dark:text-gray-300 uppercase'>Priority</th>
+                                            <th className='px-4 py-2 text-left text-xs font-medium text-gray-900 dark:text-gray-300 uppercase'>Due Date</th>
+                                            <th className='px-4 py-2 text-left text-xs font-medium text-gray-900 dark:text-gray-300 uppercase'>Assignee</th>
+                                            <th className='px-4 py-2 text-left text-xs font-medium text-gray-900 dark:text-gray-300 uppercase'>Tags</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {mockTasks.length > 0 ? (
-                                            mockTasks.map(task => (
-                                                <tr key={task.id}>
+                                        {tasks.length > 0 ? (
+                                            tasks.map((task,index) => {
+                                                 
+                                                return <tr key={index}>
                                                     <td className='px-4 py-2 text-gray-900 dark:text-gray-100'>{task.title}</td>
                                                     <td className='px-4 py-2 text-gray-700 dark:text-gray-300 capitalize'>{task.status.replace('-', ' ')}</td>
                                                     <td className='px-4 py-2 text-gray-700 dark:text-gray-300 capitalize'>{task.priority}</td>
@@ -144,10 +194,10 @@ export default function Tasks() {
                                                         {task.tags && task.tags.length > 0 ? task.tags.join(', ') : '-'}
                                                     </td>
                                                 </tr>
-                                            ))
+                                            })
                                         ) : (
                                             <tr>
-                                                <td colSpan={6} className='px-4 py-8 text-center text-gray-500 dark:text-gray-400'>
+                                                <td colSpan={6} className='px-4 py-8 text-center text-gray-900 dark:text-gray-400'>
                                                     No tasks found.
                                                 </td>
                                             </tr>
@@ -197,7 +247,7 @@ export default function Tasks() {
                                     <option value="in-progress">In Progress</option>
                                     <option value="done">Done</option>
                                 </select> */}
-                                <ThemedSelect options={[{value:'todo',label:'To Do'},{value:'in-progress',label:'In Progress'},{value:'done',label:'Done'}]} onChange={(e)=>handleFormChange(e)} value={form.status} name={'status'}/>
+                                <ThemedSelect options={[{ value: 'todo', label: 'To Do' }, { value: 'in-progress', label: 'In Progress' }, { value: 'done', label: 'Done' }]} onChange={(e) => handleFormChange(e)} value={form.status} name={'status'} />
                             </div>
                             <div>
                                 <label className="block mb-1 font-medium">Priority</label>
@@ -224,12 +274,17 @@ export default function Tasks() {
                             </div>
                             <div>
                                 <label className="block mb-1 font-medium">Assigned To (User ID)</label>
-                                <input
+                                {/* <input
                                     type="text"
                                     name="assignedTo"
                                     value={form.assignedTo}
                                     onChange={handleFormChange}
                                     className="w-full px-3 py-2 border border-gray-200 dark:border-zinc-700 rounded-md"
+                                /> */}
+                                <TaskMemberSelector
+                                    name={'assignedToId'}
+                                    value={form.assignedToId}
+                                    onChange={handleAssigneeChange}
                                 />
                             </div>
                             <div>

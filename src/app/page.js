@@ -24,7 +24,7 @@ export default function Home() {
         // "dark": theme === 'dark',
       }
     )}>
-      <main className={clsx("flex w-full flex-col sm:h-screen p-8 pb-20  sm:p-20 gap-[16px] md:gap-[32px] row-start-2  justify-center sm:items-start",
+      <main className={clsx("flex w-full flex-col sm:h-screen p-8 pb-20  sm:p-20 gap-[16px] md:gap-[32px] row-start-2  justify-center sm:items-start bg-cover",
         {
           "bg-[url(/images/bg-rose.png)]": theme === 'light',
           " bg-[url(/images/bg-dark.png)]": theme === 'dark',

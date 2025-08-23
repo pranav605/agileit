@@ -40,24 +40,24 @@ export default function Projects() {
     name: '',
     description: '',
     createdBy: '',
-    members: [{ user: '', role: 'viewer' }],
+    members: [],
     numberOfSprints: '',
   });
 
   useEffect(() => {
     setMounted(true);
     const fetchProjects = async () => {
-      const projects = await axios.get('http://localhost:5000/api/projects/user/'+session.user.id);
+      const projects = await axios.get('http://localhost:5000/api/projects/user/' + session.user.id);
       setProjects(projects.data);
     }
-    if(session)
-    fetchProjects();
+    if (session)
+      fetchProjects();
   }, [session]);
 
   useEffect(() => {
     if (session) {
       setForm(prev => ({
-        ...prev, createdBy: session?.user?.id
+        ...prev, createdBy: session?.user?.id, members: [{ user: session?.user?.id, role: 'admin' }]
       }))
     }
   }, [session]);
@@ -214,22 +214,50 @@ export default function Projects() {
                 <label className="block mb-1 font-medium">Members</label>
                 {form.members.map((member, idx) => (
                   <div key={idx} className="flex items-center gap-2 mb-2">
-                    <MemberSelector
-                      member={member}
-                      currentEmail={session?.user?.email}
-                      index={idx}
-                      onChange={handleMemberChange}
-                      onRemove={removeMember}
-                    />
-                    <select
-                      value={member.role}
-                      onChange={e => handleMemberChange(idx, 'role', e.target.value)}
-                      className="px-2 py-1 border border-gray-200 dark:border-zinc-700 rounded-md"
-                    >
-                      <option value="admin">admin</option>
-                      <option value="editor">editor</option>
-                      <option value="viewer">viewer</option>
-                    </select>
+
+                    {member.role == 'admin'
+                      ?
+                      <>
+                        <MemberSelector
+                          admin={true}
+                          member={member}
+                          currentEmail={session?.user?.email}
+                          index={idx}
+                          onChange={handleMemberChange}
+                          onRemove={removeMember}
+                        />
+                        <select
+                          disabled
+                          value={member.role}
+                          onChange={e => handleMemberChange(idx, 'role', e.target.value)}
+                          className="px-2 py-1 border border-gray-200 dark:border-zinc-700 rounded-md"
+                        >
+                          <option value="admin">admin</option>
+                          <option value="editor">editor</option>
+                          <option value="viewer">viewer</option>
+                        </select></>
+
+                      :
+                      <>
+                        <MemberSelector
+                          admin={false}
+                          member={member}
+                          currentEmail={session?.user?.email}
+                          index={idx}
+                          onChange={handleMemberChange}
+                          onRemove={removeMember}
+                        />
+                        <select
+                          value={member.role}
+                          onChange={e => handleMemberChange(idx, 'role', e.target.value)}
+                          className="px-2 py-1 border border-gray-200 dark:border-zinc-700 rounded-md"
+                        >
+                          <option value="admin">admin</option>
+                          <option value="editor">editor</option>
+                          <option value="viewer">viewer</option>
+                        </select></>
+
+                    }
                     {form.members.length > 1 && (
                       <button type="button" onClick={() => removeMember(idx)} className="text-red-600">Remove</button>
                     )}
