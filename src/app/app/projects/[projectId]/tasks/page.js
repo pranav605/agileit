@@ -8,15 +8,10 @@ import axios from 'axios'
 import { useSession } from 'next-auth/react'
 import React, { useEffect, useState } from 'react'
 
-// Updated mockTasks based on the provided schema
-const mockTasks = [
-
-]
-
 export default function Tasks() {
     const [createModal, setCreateModal] = useState(false);
     const [tasks, setTasks] = useState([]);
-    const { projectId } = useProject();
+    const { projectId , projectObj} = useProject();
     const { data: session, status } = useSession();
     const [form, setForm] = useState({
         title: '',
@@ -26,7 +21,7 @@ export default function Tasks() {
         dueDate: '',
         assignedToId: '',
         project: projectId,
-        sprint: 0,
+        sprint: 1,
         tags: ['a', 'b'],
     });
 
@@ -113,7 +108,7 @@ export default function Tasks() {
                 dueDate: '',
                 assignedToId: '',
                 project: projectId,
-                sprint: 0,
+                sprint: 1,
                 tags: [],
             });
 
@@ -188,7 +183,7 @@ export default function Tasks() {
                                                     <td className='px-4 py-2 text-gray-900 dark:text-gray-100'>{task.title}</td>
                                                     <td className='px-4 py-2 text-gray-700 dark:text-gray-300 capitalize'>{task.status.replace('-', ' ')}</td>
                                                     <td className='px-4 py-2 text-gray-700 dark:text-gray-300 capitalize'>{task.priority}</td>
-                                                    <td className='px-4 py-2 text-gray-700 dark:text-gray-300'>{task.dueDate}</td>
+                                                    <td className='px-4 py-2 text-gray-700 dark:text-gray-300'>{new Date(task.dueDate).toDateString()}</td>
                                                     <td className='px-4 py-2 text-gray-700 dark:text-gray-300'>{task.assignedTo?.name || '-'}</td>
                                                     <td className='px-4 py-2 text-gray-700 dark:text-gray-300'>
                                                         {task.tags && task.tags.length > 0 ? task.tags.join(', ') : '-'}
@@ -299,14 +294,15 @@ export default function Tasks() {
                                 />
                             </div>
                             <div>
-                                <label className="block mb-1 font-medium">Sprint</label>
+                                <label className="block mb-1 font-medium">{`Sprint Max:${projectObj.numberOfSprints}`}</label>
                                 <input
                                     type="number"
                                     name="sprint"
                                     value={form.sprint}
                                     onChange={handleFormChange}
                                     className="w-full px-3 py-2 border border-gray-200 dark:border-zinc-700 rounded-md"
-                                    min={0}
+                                    min={1}
+                                    max={projectObj.numberOfSprints}
                                 />
                             </div>
                             <div>

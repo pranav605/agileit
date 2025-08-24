@@ -8,7 +8,6 @@ import MemberSelector from '@/components/MemberSelector';
 import axios from 'axios';
 import Link from 'next/link';
 import { TrashIcon } from '@heroicons/react/24/outline';
-import { data } from 'autoprefixer';
 
 export default function Projects() {
   const [mounted, setMounted] = useState(false);
@@ -26,8 +25,15 @@ export default function Projects() {
     if (!deleteProject) return;
 
     try {
-      // await axios.delete(`http://localhost:5000/api/projects/${deleteProject._id}`);
-      setProjects(prev => prev.filter(p => p._id !== deleteProject._id));
+      const res = await fetch(`http://localhost:5000/api/projects/delete/${deleteProject._id}?currentUser=${session?.user?.id}`, {
+        method: 'DELETE',
+      });
+      if (res.status == 403) {
+        const reason = await res.json();
+        alert(reason.error);
+      } else {
+        setProjects(prev => prev.filter(p => p._id !== deleteProject._id));
+      }
       setDeleteProject(null);
     } catch (error) {
       console.error("Error deleting project:", error);
@@ -155,7 +161,7 @@ export default function Projects() {
               key={idx}
               className='cursor-pointer h-24 w-full rounded-md border border-gray-200 relative dark:border-zinc-800 flex flex-col items-center justify-center text-lg font-medium p-2 z-20'
             >
-              <Link href={`/app/projects/${project._id}`} className='flex flex-col items-center justify-center text-lg font-medium p-2 z-20'>
+              <Link href={`/app/projects/${project._id}`} className='flex flex-col items-center justify-center text-lg w-full h-full font-medium p-2 z-20'>
                 <div>{project.name}</div>
                 <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 text-center">
                   {(project.description && project.description.length > 150)
@@ -255,12 +261,13 @@ export default function Projects() {
                           <option value="admin">admin</option>
                           <option value="editor">editor</option>
                           <option value="viewer">viewer</option>
-                        </select></>
+                        </select>
+                        {form.members.length > 1 && (
+                      <button type="button" onClick={() => removeMember(idx)} className="text-red-600">Remove</button>
+                    )}</>
 
                     }
-                    {form.members.length > 1 && (
-                      <button type="button" onClick={() => removeMember(idx)} className="text-red-600">Remove</button>
-                    )}
+                    
                   </div>
                 ))}
                 <button type="button" onClick={addMember} className="text-blue-500 mt-1">+ Add Member</button>

@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     DndContext,
     closestCorners,
@@ -9,6 +9,9 @@ import {
 } from '@dnd-kit/core';
 import { ClipboardIcon, ChatBubbleOvalLeftIcon, EyeIcon } from '@heroicons/react/24/outline';
 import Image from 'next/image';
+import axios from 'axios';
+import { useSession } from 'next-auth/react';
+import { useProject } from '@/contexts/ProjectContext';
 
 const initialTasks = [
     { id: '1', title: 'Design homepage', status: 'todo', priority: 'High' },
@@ -40,8 +43,8 @@ function TaskCard({ task, dragOverlay = false }) {
     const style = dragOverlay
         ? {}
         : transform
-        ? { transform: `translate(${transform.x}px, ${transform.y}px)` }
-        : undefined;
+            ? { transform: `translate(${transform.x}px, ${transform.y}px)` }
+            : undefined;
 
     const getPriorityColor = (priority) => {
         switch ((priority || '').toLowerCase()) {
@@ -56,57 +59,93 @@ function TaskCard({ task, dragOverlay = false }) {
         }
     };
 
+    const formatDate = (dateStr) => {
+        try {
+            return new Date(dateStr).toLocaleDateString(undefined, {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+            });
+        } catch {
+            return '';
+        }
+    };
+
     return (
         <div
             ref={dragOverlay ? null : setNodeRef}
             style={style}
-            className={`bg-white dark:bg-black p-4 mb-4 rounded-xl shadow-sm border border-gray-200 dark:border-zinc-800 transition-opacity ${
-                isDragging ? 'opacity-50' : 'opacity-100'
-            }`}
+            className={`bg-white dark:bg-black p-4 mb-4 rounded-xl shadow-sm border border-gray-200 dark:border-zinc-800 transition-opacity ${isDragging ? 'opacity-50' : 'opacity-100'
+                }`}
             {...(dragOverlay ? {} : listeners)}
             {...(dragOverlay ? {} : attributes)}
         >
-            {/* Header */}
+            {/* Header: Priority + Due Date */}
             <div className="flex justify-between items-center mb-2">
                 <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-zinc-200">
-                    <span className="h-2 w-2 rounded-full bg-red-400"></span>
-                    <span>UI Design</span>
+                    <span className="h-2 w-2 rounded-full bg-blue-400"></span>
+                    <span>Due: {formatDate(task.dueDate)}</span>
                 </div>
-                <div className={`text-xs px-2 py-1 rounded-md font-medium flex items-center gap-1  ${getPriorityColor(task.priority)}`}>
+                <div
+                    className={`text-xs px-2 py-1 rounded-md font-medium flex items-center gap-1 ${getPriorityColor(
+                        task.priority
+                    )}`}
+                >
                     <ClipboardIcon className="h-4 w-4" />
                     {task.priority}
                 </div>
             </div>
 
-            {/* Title and Description */}
-            <h3 className="text-md font-semibold text-gray-900 dark:text-zinc-200">{task.title}</h3>
-            <p className="text-sm text-gray-500 dark:text-zinc-200 mb-3">Create low-fidelity designs that outline the basic structure and layout of the product or service..</p>
+            {/* Title + Description */}
+            <h3 className="text-md font-semibold text-gray-900 dark:text-zinc-200">
+                {task.title}
+            </h3>
+            <p className="text-sm text-gray-500 dark:text-zinc-200 mb-3">
+                {task.description}
+            </p>
 
-            {/* Progress */}
-            <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-zinc-200 mb-3">
-                <ClipboardIcon className="h-4 w-4" />
-                <span>0/8</span>
-            </div>
+            {/* Tags */}
+            {task.tags?.length > 0 && (
+                <div className="flex flex-wrap gap-2 mb-3">
+                    {task.tags.map((tag, idx) => (
+                        <span
+                            key={idx}
+                            className="text-xs px-2 py-1 bg-gray-100 dark:bg-zinc-800 rounded-md text-gray-600 dark:text-zinc-200"
+                        >
+                            #{tag}
+                        </span>
+                    ))}
+                </div>
+            )}
 
-            {/* Footer */}
-            <div className="flex justify-between items-center pt-2 border-t border-gray-100 mt-2">
-                {/* Avatars */}
-                <div className="flex -space-x-2">
-                    <Image src="/images/avatar.png" alt="User 1" width={24} height={24} className="rounded-full border border-gray-200" />
-                    <Image src="/images/avatar.png" alt="User 2" width={24} height={24} className="rounded-full border border-gray-200" />
+            {/* Footer: Assigned To + Activity */}
+            <div className="flex justify-between items-center pt-2 border-t border-gray-100 dark:border-zinc-800 mt-2">
+                {/* Assigned To */}
+                <div className="flex items-center gap-2">
+                    <Image
+                        src="/images/avatar.png"
+                        alt={task.assignedTo?.name || "User"}
+                        width={24}
+                        height={24}
+                        className="rounded-full border border-gray-200 dark:border-zinc-800"
+                    />
+                    <span className="text-sm text-gray-700 dark:text-zinc-200">
+                        {task.assignedTo?.name}
+                    </span>
                 </div>
 
-                {/* Icons */}
+                {/* Placeholder activity icons */}
                 <div className="flex items-center gap-3 text-gray-500 dark:text-zinc-200">
                     <EyeIcon className="h-4 w-4" />
-                    <span className="text-xs">2</span>
+                    <span className="text-xs">0</span>
                     <ChatBubbleOvalLeftIcon className="h-4 w-4" />
-                    <span className="text-xs">19</span>
+                    <span className="text-xs">0</span>
                 </div>
             </div>
         </div>
     );
 }
+
 
 // Column component
 function Column({ column, tasks, children }) {
@@ -124,8 +163,25 @@ function Column({ column, tasks, children }) {
 }
 
 export default function KanbanBoard() {
-    const [tasks, setTasks] = useState(initialTasks);
+    const [tasks, setTasks] = useState([]);
     const [activeTask, setActiveTask] = useState(null);
+    const { data: session, status } = useSession();
+    const { projectId } = useProject();
+
+    useEffect(() => {
+        const fetchTasks = async () => {
+            const res = await axios.get('http://localhost:5000/api/tasks/project/' + projectId);
+            const normalizedTasks = res.data.map(task => ({
+                ...task,
+                id: task._id, // <-- map _id to id
+            }));
+            setTasks(normalizedTasks);
+            console.log(normalizedTasks);
+        };
+
+        if (session) fetchTasks();
+    }, [session]);
+
 
     const handleDragStart = (event) => {
         const task = tasks.find(t => t.id === event.active.id);
@@ -152,22 +208,47 @@ export default function KanbanBoard() {
             onDragStart={handleDragStart}
             onDragEnd={handleDragEnd}
         >
-            <div className="flex p-4">
-                {columns.map(col => (
-                    <Column key={col.id} column={col} tasks={tasks.filter(t => t.status === col.id)}>
-                        {tasks
-                            .filter(task => task.status === col.id)
-                            .map(task => <TaskCard key={task.id} task={task} />)}
-                    </Column>
-                ))}
-            </div>
+            {tasks.length === 0 ? (
+                <div className="flex flex-col items-center justify-center w-full h-[70vh] text-center">
+        <Image
+            src="/images/kanban.png" 
+            alt="No tasks"
+            width={200}
+            height={200}
+            priority={'height'}
+            className="mb-6 opacity-80"
+        />
+        <h2 className="text-xl font-semibold text-gray-700 dark:text-zinc-300">
+            No tasks available
+        </h2>
+        <p className="text-gray-500 dark:text-zinc-400 mt-2">
+            Start by creating a new task for this project.
+        </p>
+    </div>
+            ) : (
+                <div className="flex p-4">
+                    {columns.map((col, index) => (
+                        <Column
+                            key={index}
+                            column={col}
+                            tasks={tasks.filter(t => t.status === col.id)}
+                        >
+                            {tasks
+                                .filter(task => task.status === col.id)
+                                .map((task, index) => (
+                                    <TaskCard key={task.id || index} task={task} />
+                                ))}
+                        </Column>
+                    ))}
+                </div>
+            )}
 
             <DragOverlay>
                 {activeTask ? (
                     <TaskCard task={activeTask} dragOverlay />
                 ) : null}
             </DragOverlay>
-
         </DndContext>
+
     );
 }

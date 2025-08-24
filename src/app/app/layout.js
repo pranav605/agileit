@@ -73,7 +73,7 @@ export default function AppLayout({ children }) {
             <NavLink href={`/app/projects/${projectId}/team`}>Team Members</NavLink>
             <NavLink href={`/app/projects/${projectId}/settings`}>Settings</NavLink>
             <NavLink
-              href="/app"
+              href="/app/projects"
               className="text-sm mt-6 text-gray-400 hover:text-purple-700 dark:hover:text-white"
             >
               ← Back to Dashboard

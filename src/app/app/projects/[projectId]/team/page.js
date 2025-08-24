@@ -1,24 +1,24 @@
 'use client';
 import ThemedButton from '@/components/ThemedButton'
+import { useProject } from '@/contexts/ProjectContext';
 import { PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
-import React from 'react'
+import axios from 'axios';
+import React, { useEffect, useState } from 'react'
 
 export default function Team() {
+    const {projectId} = useProject();
+    const [team, setTeam] = useState([]);
 
-  const mockTasks = [
-    {
-        id: 1,
-        name: "John Wick",
-        email: 'jonathan.wick@gmail.com',
-        role: "Assassin"
-    },
-    {
-        id: 2,
-        name: "Tony Stark",
-        email: 'friday@starkindustries.com',
-        role: "Iron man"
-    },
-]
+    useEffect(()=>{
+        async function fetchTeam(){
+            const res = await axios.get('http://localhost:5000/api/projects/team/'+projectId);
+            console.log(res);
+            setTeam(res.data);
+        }
+
+        fetchTeam();
+    },[])
+
   return (
      <div className='w-full h-full'>
                 <div className='flex flex-col'>
@@ -49,12 +49,12 @@ export default function Team() {
                                         </tr>
                                     </thead>
                                         <tbody>
-                                            {mockTasks.length > 0 ? (
-                                                mockTasks.map(task => (
-                                                    <tr key={task.id}>
-                                                        <td className='px-4 py-2 text-gray-900 dark:text-gray-100'>{task.name}</td>
-                                                        <td className='px-4 py-2 text-gray-700 dark:text-gray-300 '>{task.email}</td>
-                                                        <td className='px-4 py-2 text-gray-700 dark:text-gray-300 capitalize'>{task.role}</td>
+                                            {team.length > 0 ? (
+                                                team.map((team,index) => (
+                                                    <tr key={index}>
+                                                        <td className='px-4 py-2 text-gray-900 dark:text-gray-100'>{team.user.name}</td>
+                                                        <td className='px-4 py-2 text-gray-700 dark:text-gray-300 '>{team.user.email}</td>
+                                                        <td className='px-4 py-2 text-gray-700 dark:text-gray-300 capitalize'>{team.role}</td>
                                                         <td className='px-4 py-2 text-gray-700 dark:text-gray-300 flex gap-1'>
                                                           <div className='p-2 border-gray-200 dark:border-zinc-800 border rounded cursor-pointer'>
                                                             <PencilIcon height={16} width={16}/>  
@@ -68,7 +68,7 @@ export default function Team() {
                                             ) : (
                                                 <tr>
                                                     <td colSpan={6} className='px-4 py-8 text-center text-gray-500 dark:text-gray-400'>
-                                                        No tasks found.
+                                                        No members found.
                                                     </td>
                                                 </tr>
                                             )}
