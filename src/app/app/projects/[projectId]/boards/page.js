@@ -13,11 +13,6 @@ import axios from 'axios';
 import { useSession } from 'next-auth/react';
 import { useProject } from '@/contexts/ProjectContext';
 
-const initialTasks = [
-    { id: '1', title: 'Design homepage', status: 'todo', priority: 'High' },
-    { id: '2', title: 'Implement login', status: 'in-progress', priority: 'Medium' },
-    { id: '3', title: 'Set up database', status: 'done', priority: 'Low' },
-];
 
 const columns = [
     { id: 'todo', label: 'To Do' },
@@ -25,20 +20,10 @@ const columns = [
     { id: 'done', label: 'Done' },
 ];
 
-// Card component
+// TaskCard (Professional Look)
 function TaskCard({ task, dragOverlay = false }) {
-    const draggable = useDraggable({
-        id: task.id,
-        data: { task },
-    });
-
-    const {
-        attributes,
-        listeners,
-        setNodeRef,
-        transform,
-        isDragging
-    } = dragOverlay ? {} : draggable;
+    const draggable = useDraggable({ id: task.id, data: { task } });
+    const { attributes, listeners, setNodeRef, transform, isDragging } = dragOverlay ? {} : draggable;
 
     const style = dragOverlay
         ? {}
@@ -48,116 +33,89 @@ function TaskCard({ task, dragOverlay = false }) {
 
     const getPriorityColor = (priority) => {
         switch ((priority || '').toLowerCase()) {
-            case 'high':
-                return 'bg-red-100 text-red-800';
-            case 'medium':
-                return 'bg-yellow-100 text-yellow-800';
-            case 'low':
-                return 'bg-green-100 text-green-800';
-            default:
-                return 'bg-gray-100 text-gray-800';
+            case 'high': return 'bg-red-50 text-red-700';
+            case 'medium': return 'bg-yellow-50 text-yellow-700';
+            case 'low': return 'bg-green-50 text-green-700';
+            default: return 'bg-gray-50 text-gray-600';
         }
     };
 
     const formatDate = (dateStr) => {
         try {
-            return new Date(dateStr).toLocaleDateString(undefined, {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
-            });
-        } catch {
-            return '';
-        }
+            return new Date(dateStr).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+        } catch { return ''; }
     };
 
     return (
         <div
             ref={dragOverlay ? null : setNodeRef}
             style={style}
-            className={`bg-white dark:bg-black p-4 mb-4 rounded-xl shadow-sm border border-gray-200 dark:border-zinc-800 transition-opacity ${isDragging ? 'opacity-50' : 'opacity-100'
-                }`}
+            className={`bg-white dark:bg-zinc-900 p-5 mb-4 rounded-lg border border-gray-200 dark:border-zinc-700 shadow-md hover:shadow-lg transition-all ${isDragging ? 'opacity-60' : 'opacity-100'}`}
             {...(dragOverlay ? {} : listeners)}
             {...(dragOverlay ? {} : attributes)}
         >
-            {/* Header: Priority + Due Date */}
-            <div className="flex justify-between items-center mb-2">
-                <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-zinc-200">
+            {/* Header */}
+            <div className="flex justify-between items-center mb-3">
+                <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-zinc-300">
                     <span className="h-2 w-2 rounded-full bg-blue-400"></span>
                     <span>Due: {formatDate(task.dueDate)}</span>
                 </div>
-                <div
-                    className={`text-xs px-2 py-1 rounded-md font-medium flex items-center gap-1 ${getPriorityColor(
-                        task.priority
-                    )}`}
-                >
+                <div className={`text-xs px-2 py-1 rounded-md font-medium flex items-center gap-1 ${getPriorityColor(task.priority)}`}>
                     <ClipboardIcon className="h-4 w-4" />
                     {task.priority}
                 </div>
             </div>
 
-            {/* Title + Description */}
-            <h3 className="text-md font-semibold text-gray-900 dark:text-zinc-200">
-                {task.title}
-            </h3>
-            <p className="text-sm text-gray-500 dark:text-zinc-200 mb-3">
-                {task.description}
-            </p>
+            {/* Title & Description */}
+            <h3 className="text-md font-semibold text-gray-900 dark:text-zinc-200 mb-1">{task.title}</h3>
+            <p className="text-sm text-gray-600 dark:text-zinc-300 mb-3">{task.description}</p>
 
             {/* Tags */}
             {task.tags?.length > 0 && (
                 <div className="flex flex-wrap gap-2 mb-3">
                     {task.tags.map((tag, idx) => (
-                        <span
-                            key={idx}
-                            className="text-xs px-2 py-1 bg-gray-100 dark:bg-zinc-800 rounded-md text-gray-600 dark:text-zinc-200"
-                        >
+                        <span key={idx} className="text-xs px-2 py-1 bg-gray-100 dark:bg-zinc-800 rounded-md text-gray-600 dark:text-zinc-200">
                             #{tag}
                         </span>
                     ))}
                 </div>
             )}
 
-            {/* Footer: Assigned To + Activity */}
-            <div className="flex justify-between items-center pt-2 border-t border-gray-100 dark:border-zinc-800 mt-2">
-                {/* Assigned To */}
+            {/* Footer */}
+            <div className="flex justify-between items-center pt-2 border-t border-gray-100 dark:border-zinc-700 mt-2 text-sm text-gray-600 dark:text-zinc-300">
                 <div className="flex items-center gap-2">
-                    <Image
-                        src="/images/avatar.png"
-                        alt={task.assignedTo?.name || "User"}
-                        width={24}
-                        height={24}
-                        className="rounded-full border border-gray-200 dark:border-zinc-800"
-                    />
-                    <span className="text-sm text-gray-700 dark:text-zinc-200">
-                        {task.assignedTo?.name}
-                    </span>
+                    <Image src="/images/avatar.png" alt={task.assignedTo?.name || "User"} width={28} height={28} className="rounded-full border border-gray-200 dark:border-zinc-700" />
+                    {task.assignedTo?.name}
                 </div>
-
-                {/* Placeholder activity icons */}
-                <div className="flex items-center gap-3 text-gray-500 dark:text-zinc-200">
-                    <EyeIcon className="h-4 w-4" />
-                    <span className="text-xs">0</span>
-                    <ChatBubbleOvalLeftIcon className="h-4 w-4" />
-                    <span className="text-xs">0</span>
+                <div className="flex items-center gap-3">
+                    <EyeIcon className="h-4 w-4" /> <span>0</span>
+                    <ChatBubbleOvalLeftIcon className="h-4 w-4" /> <span>0</span>
                 </div>
             </div>
         </div>
     );
 }
 
-
-// Column component
-function Column({ column, tasks, children }) {
+// Column (Professional Look)
+function Column({ column, tasks }) {
     const { setNodeRef } = useDroppable({ id: column.id });
 
     return (
         <div
             ref={setNodeRef}
-            className="flex-1 p-2 min-h-[400px] bg-gray-50 dark:bg-transparent rounded-lg mx-2"
+            className="flex-1 flex flex-col bg-gray-100 dark:bg-zinc-900 rounded-lg p-0 mx-0"
         >
-            <h2 className="text-center font-bold mb-2 text-lg">{column.label}</h2>
-            {children}
+            {/* Sticky Header */}
+            <div className="sticky top-0 z-10 bg-gray-100 dark:bg-zinc-900 border-b border-gray-300 dark:border-zinc-700 p-3 text-center font-semibold text-gray-700 dark:text-zinc-200">
+                {column.label}
+            </div>
+
+            {/* Scrollable Tasks */}
+            <div className="flex-1 p-3 overflow-y-auto max-h-[70vh]">
+                {tasks.map((task) => (
+                    <TaskCard key={task.id} task={task} />
+                ))}
+            </div>
         </div>
     );
 }
@@ -188,10 +146,21 @@ export default function KanbanBoard() {
         setActiveTask(task);
     };
 
+    const updateStatus = (id, status) => {
+        axios.post(`http://localhost:5000/api/tasks/update/${id}`,{status: status})
+        .then((res)=>{
+            console.log(res);
+        })
+        .catch((err)=>{
+            console.log(err);
+        })
+    }
+
     const handleDragEnd = (event) => {
         const { over, active } = event;
-
+        
         if (over && active.id !== over.id) {
+            if(activeTask.status != over.id) updateStatus(active.id, over.id);
             setTasks(prev =>
                 prev.map(task =>
                     task.id === active.id ? { ...task, status: over.id } : task
@@ -226,7 +195,7 @@ export default function KanbanBoard() {
         </p>
     </div>
             ) : (
-                <div className="flex p-4">
+                <div className="flex bg-gray-200 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded space-x-0">
                     {columns.map((col, index) => (
                         <Column
                             key={index}

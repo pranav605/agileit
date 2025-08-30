@@ -110,6 +110,7 @@ export default function Tasks() {
                 project: projectId,
                 sprint: 1,
                 tags: [],
+                createdBy: session?.user?.id,
             });
 
             setCreateModal(false);
