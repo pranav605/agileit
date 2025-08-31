@@ -67,7 +67,7 @@ function TaskCard({ task, dragOverlay = false }) {
             </div>
 
             {/* Title & Description */}
-            <h3 className="text-md font-semibold text-gray-900 dark:text-zinc-200 mb-1">{task.title}</h3>
+            <h3 className={`text-md font-semibold text-gray-900 dark:text-zinc-200 mb-1 ${task.status == "done" ? 'line-through' : ''}`}>{task.title}</h3>
             <p className="text-sm text-gray-600 dark:text-zinc-300 mb-3">{task.description}</p>
 
             {/* Tags */}
