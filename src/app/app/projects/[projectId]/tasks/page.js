@@ -6,13 +6,15 @@ import { useProject } from '@/contexts/ProjectContext'
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline'
 import axios from 'axios'
 import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 
 export default function Tasks() {
     const [createModal, setCreateModal] = useState(false);
     const [tasks, setTasks] = useState([]);
-    const { projectId , projectObj} = useProject();
+    const { projectId, projectObj } = useProject();
     const { data: session, status } = useSession();
+    const router = useRouter();
     const [form, setForm] = useState({
         title: '',
         description: '',
@@ -33,8 +35,6 @@ export default function Tasks() {
         const fetchTasks = async () => {
             const tasks = await axios.get('http://localhost:5000/api/tasks/project/' + projectId);
             setTasks(tasks.data);
-            console.log(tasks.data);
-            
         }
         if (session)
             fetchTasks();
@@ -94,11 +94,11 @@ export default function Tasks() {
             // // Update projects state with new task
             const fetchTasks = async () => {
                 const tasks = await axios.get('http://localhost:5000/api/tasks/project/' + projectId);
-                
+
                 setTasks(tasks.data);
             }
             fetchTasks();
-            
+
             // Reset form after submit
             setForm({
                 title: '',
@@ -178,9 +178,11 @@ export default function Tasks() {
                                     </thead>
                                     <tbody>
                                         {tasks.length > 0 ? (
-                                            tasks.map((task,index) => {
-                                                 
-                                                return <tr key={index}>
+                                            tasks.map((task, index) => {
+
+                                                return <tr key={index}
+                                                    className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
+                                                    onClick={() => router.push(`/app/projects/${projectId}/tasks/${task._id}`)}>
                                                     <td className='px-4 py-2 text-gray-900 dark:text-gray-100'>{task.title}</td>
                                                     <td className='px-4 py-2 text-gray-700 dark:text-gray-300 capitalize'>{task.status.replace('-', ' ')}</td>
                                                     <td className='px-4 py-2 text-gray-700 dark:text-gray-300 capitalize'>{task.priority}</td>

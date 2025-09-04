@@ -15,8 +15,6 @@ export default function ProjectLayout({ children }) {
   useEffect(()=>{
     async function fetchProject(){
       const res = await axios.get('http://localhost:5000/api/projects/'+projectId);
-      console.log(res.data);
-      
       setProjectObj(res.data);
     }
     if(session)
