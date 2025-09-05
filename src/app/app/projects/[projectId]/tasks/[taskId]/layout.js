@@ -12,7 +12,7 @@ export default function TaskDetailLayout({ children }) {
     return (
         <TaskContext.Provider value={{ taskId }}>
             <div className="flex w-full">
-                <main className="flex-1 p-6">{children}</main>
+                <main className="flex-1">{children}</main>
             </div>
         </TaskContext.Provider>
     );
