@@ -8,6 +8,7 @@ import {
   TagIcon,
   PencilIcon,
   CheckIcon,
+  PhotoIcon
 } from '@heroicons/react/24/outline';
 import Image from 'next/image';
 import axios from 'axios';
@@ -96,166 +97,90 @@ export default function TaskDetail() {
   };
 
   return (
-    <div className="grid grid-cols-3 gap-6 mx-auto p-6">
-      {/* Left Column (Main Content) */}
-      <div className="col-span-2 bg-gray-50 dark:bg-zinc-900 rounded-lg shadow-md p-6">
-        {/* Title */}
-        <h2 className="text-2xl font-semibold text-gray-900 dark:text-zinc-200 mb-3">
-          {task.title}
-        </h2>
 
-        {/* Description */}
-        <div className="mb-6">
-          <h3 className="text-lg font-semibold text-gray-800 dark:text-zinc-200 mb-2">
-            Description
-          </h3>
-          <p className="text-gray-700 dark:text-zinc-300">{task.description}</p>
-        </div>
-
-        {/* Comments */}
-        <div>
-          <h3 className="text-lg font-semibold text-gray-800 dark:text-zinc-200 mb-3 flex items-center gap-2">
-            <ChatBubbleOvalLeftIcon className="h-5 w-5" />
-            Comments
-          </h3>
-
-          <div className="space-y-4 mb-4">
-            {task.comments?.length > 0 ? (
-              task.comments.map((c, idx) => (
-                <div
-                  key={idx}
-                  className="bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 p-3 rounded-md"
-                >
-                  <p className="text-sm text-gray-800 dark:text-zinc-200">{c.text}</p>
-                  <span className="text-xs text-gray-500 dark:text-zinc-400">
-                    — {c.author}, {formatDate(c.createdAt)}
-                  </span>
-                </div>
-              ))
-            ) : (
-              <p className="text-sm text-gray-500 dark:text-zinc-400">
-                No comments yet. Be the first to comment!
-              </p>
-            )}
+    <div className='flex flex-row gap-4 h-[calc(100vh-100px)]'>
+      <div className='flex flex-col flex-2/3 text-gray-900 dark:text-zinc-200 overflow-y-auto pr-2'>
+        <h1 className='text-2xl font-semibold mb-4'>{task.title}</h1>
+        <div className='flex flex-col'>
+          <h2 className='text-lg font-semibold mb-2'>Description</h2>
+          <p className='mb-4'>{task.description}</p>
+          <div className='border border-gray-200 dark:border-zinc-700 w-full rounded h-32 flex items-center justify-center hover:bg-zinc-900 mb-4 cursor-pointer'>
+            <span className='flex flex-row items-center justify-center gap-2'>Drag and drop supporting files or images <PhotoIcon className='h-5 w-5'/></span>
           </div>
+          <div>
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-zinc-200 mb-3 flex items-center gap-2">
+              <ChatBubbleOvalLeftIcon className="h-5 w-5" />
+              Comments
+            </h3>
+            <div className="space-y-4 mb-4">
+              {task.comments?.length > 0 ? (
+                task.comments.map((c, idx) => (
+                  <div
+                    key={idx}
+                    className="bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 p-3 rounded-md"
+                  >
+                    <p className="text-sm text-gray-800 dark:text-zinc-200">{c.text}</p>
+                    <span className="text-xs text-gray-500 dark:text-zinc-400">
+                      — {c.author}, {formatDate(c.createdAt)}
+                    </span>
+                  </div>
+                ))
+              ) : (
+                <p className="text-sm text-gray-500 dark:text-zinc-400">
+                  No comments yet. Be the first to comment!
+                </p>
+              )}
+            </div>
 
-          {/* Add Comment */}
-          <div className="flex items-center gap-2">
-            <input
-              type="text"
-              value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
-              placeholder="Write a comment..."
-              className="flex-1 px-3 py-2 rounded-md border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm text-gray-800 dark:text-zinc-200 focus:outline-none"
-            />
-            <button
-              onClick={handleAddComment}
-              className="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-md"
-            >
-              Add
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Right Column (Sidebar Details) */}
-      <div className="col-span-1 bg-gray-50 dark:bg-zinc-900 rounded-lg shadow-md p-6 space-y-5">
-        {/* Assignee */}
-        <div>
-          <h4 className="text-sm font-semibold text-gray-700 dark:text-zinc-300 mb-2">
-            Assignee
-          </h4>
-          <div className="flex items-center gap-2">
-            <Image
-              src={task.assignedTo?.avatar || '/images/avatar.png'}
-              alt={task.assignedTo?.name || 'User'}
-              width={32}
-              height={32}
-              className="rounded-full border border-gray-200 dark:border-zinc-700"
-            />
-            <span className="text-sm text-gray-800 dark:text-zinc-200">
-              {task.assignedTo?.name || 'Unassigned'}
-            </span>
-          </div>
-        </div>
-
-        {/* Status */}
-        <div>
-          <h4 className="text-sm font-semibold text-gray-700 dark:text-zinc-300 mb-2">
-            Status
-          </h4>
-          {editing.status ? (
+            {/* Add Comment */}
             <div className="flex items-center gap-2">
               <input
                 type="text"
-                value={updatedFields.status}
-                onChange={(e) =>
-                  setUpdatedFields({ ...updatedFields, status: e.target.value })
-                }
-                className="px-2 py-1 text-sm rounded-md border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-800 dark:text-zinc-200"
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                placeholder="Write a comment..."
+                className="flex-1 px-3 py-2 rounded-md border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm text-gray-800 dark:text-zinc-200 focus:outline-none"
               />
-              <button onClick={() => saveField('status')}>
-                <CheckIcon className="h-5 w-5 text-green-600" />
+              <button
+                onClick={handleAddComment}
+                className="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-md"
+              >
+                Add
               </button>
             </div>
-          ) : (
-            <div
-              className="flex items-center gap-2 cursor-pointer"
-              onClick={() => toggleEdit('status')}
+          </div>
+        </div>
+      </div>
+      <div className='flex flex-col gap-4 flex-1/3 border border-gray-200 dark:border-zinc-700 shadow-md rounded p-6 sticky top-0 self-start h-fit'>
+        <div className='font-bold text-gray-700 dark:text-zinc-300 w-full'>
+          <h1 className='text-lg'>Details</h1>
+        </div>
+        <div className='flex flex-row gap-2 w-full h-8 items-center'>
+          <h4 className='text-sm font-semibold text-gray-700 dark:text-zinc-300 w-full'>Assignee</h4>
+          <span className='text-xs px-2 py-1 w-full'>{task.assignedTo?.name}</span>
+        </div>
+        <div className='flex flex-row gap-2 w-full h-8 items-center'>
+          <h4 className='text-sm font-semibold text-gray-700 dark:text-zinc-300 w-full'>Reporter</h4>
+          <span className='text-xs px-2 py-1 w-full'>{task.createdBy?.name}</span>
+        </div>
+        <div className='flex flex-row gap-2 w-full h-8 items-center'>
+          <h4 className='text-sm font-semibold text-gray-700 dark:text-zinc-300 w-full'>Priority</h4>
+          <span className='text-xs px-2 py-1 w-full'>{task.priority}</span>
+        </div>
+        <div className='flex flex-row gap-2 w-full h-8 items-center'>
+          <h4 className='text-sm font-semibold text-gray-700 dark:text-zinc-300 w-full'>Status</h4>
+          <span className='text-xs px-2 py-1 w-full'>{task.status}</span>
+        </div>
+        <div className='flex flex-row gap-2 w-full h-8 items-center'>
+          <h4 className='text-sm font-semibold text-gray-700 dark:text-zinc-300 w-full'>Tags</h4>
+          <span className='text-xs px-2 py-1 w-full'>{task.tags?.map((tag, idx) => (
+            <span
+              key={idx}
+              className="text-xs px-2 py-1 bg-gray-100 dark:bg-zinc-800 rounded-md text-gray-600 dark:text-zinc-200"
             >
-              <span className="text-sm">{task.status}</span>
-              <PencilIcon className="h-4 w-4 text-gray-500" />
-            </div>
-          )}
-        </div>
-
-        {/* Priority */}
-        <div>
-          <h4 className="text-sm font-semibold text-gray-700 dark:text-zinc-300 mb-2">
-            Priority
-          </h4>
-          <div
-            className={`text-xs px-2 py-1 rounded-md font-medium flex items-center gap-1 w-fit cursor-pointer ${getPriorityColor(
-              task.priority
-            )}`}
-            onClick={() => toggleEdit('priority')}
-          >
-            <ClipboardIcon className="h-4 w-4" />
-            {task.priority}
-          </div>
-        </div>
-
-        {/* Due Date */}
-        <div>
-          <h4 className="text-sm font-semibold text-gray-700 dark:text-zinc-300 mb-2">
-            Due Date
-          </h4>
-          <p className="text-sm text-gray-800 dark:text-zinc-200">
-            {formatDate(task.dueDate)}
-          </p>
-        </div>
-
-        {/* Tags */}
-        <div>
-          <h4 className="text-sm font-semibold text-gray-700 dark:text-zinc-300 mb-2 flex items-center gap-1">
-            <TagIcon className="h-4 w-4" /> Tags
-          </h4>
-          <div className="flex flex-wrap gap-2">
-            {task.tags?.map((tag, idx) => (
-              <span
-                key={idx}
-                className="text-xs px-2 py-1 bg-gray-100 dark:bg-zinc-800 rounded-md text-gray-600 dark:text-zinc-200"
-              >
-                #{tag}
-              </span>
-            ))}
-          </div>
-        </div>
-
-        {/* Views */}
-        <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-zinc-300">
-          <EyeIcon className="h-5 w-5" />
-          {task.views || 0} views
+              #{tag}
+            </span>
+          ))}</span>
         </div>
       </div>
     </div>
